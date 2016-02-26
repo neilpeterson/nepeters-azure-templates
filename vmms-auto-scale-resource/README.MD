@@ -1,0 +1,8 @@
+# Deploy Ubuntu with Docker container and OMS container monitoring
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fneilpeterson%2FAzure_Templates%2Fmaster%2Fvmms-auto-scale-resource%2Fazuredeploy.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fneilpeterson%2FAzure_Templates%2Fmaster%2Fvmms-auto-scale-resource%2Fazuredeploy.json" target="_blank">
+    <img src="http://armviz.io/visualizebutton.png"/>
+</a>
