@@ -303,7 +303,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "https://raw.githubusercontent.com/neilpeterson/Azure_CustomScripts/master/Linux-OMS/oms.sh"
+            "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/ubuntu-docker-oms/oms.sh"
           ],
           "commandToExecute": "sudo sh oms.sh"
         }

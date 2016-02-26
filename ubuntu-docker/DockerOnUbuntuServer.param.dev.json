@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "neillocal"
+            "value": "user"
         },
         "dnsNameForPublicIP": {
-            "value": "dockerneil"
+            "value": "dns"
         },
         "adminPassword": {
-            "value": "Monkeyskip76"
+            "value": "password"
         },
         "dockerImage": {
-            "value": "neilpeterson/nepetersv3"
+            "value": "ubuntu"
         },
         "vmName": {
-            "value": "dockerneil"
+            "value": "vmname"
         }
     }
 }

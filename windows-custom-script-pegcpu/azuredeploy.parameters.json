@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "neillocal"
+            "value": "username"
         },
         "dnsNameForPublicIP": {
-            "value": "pegcpu02"
+            "value": "dnsname"
         },
         "adminPassword": {
-            "value": "Password12"
+            "value": "password"
         }
     }
 }
