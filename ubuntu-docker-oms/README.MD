@@ -3,8 +3,8 @@
 The following items are completed:
 
 - Deploy Ubuntu VM
-- Azure Docker VM Extension installs Docker and deploy a container
-- Azure Docker VM Extension deploys a container
+- Docker VM Extension installs Docker
+- Docker VM Extension deploys a container
 - Linux Custom Script Extension deploys the OMS agent and configures container monitoring
 
 
