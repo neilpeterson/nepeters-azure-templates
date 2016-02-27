@@ -241,7 +241,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/azure-vm-extensions/master/windows-script-peg-cpu/pegcpu.ps1"
+                "https://raw.githubusercontent.com/neilpeterson/azure-vm-extensions/master/windows-script-peg-cpu/support-scripts/pegcpu.ps1"
               ],
               "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File pegcpu.ps1"
             }

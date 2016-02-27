@@ -36,7 +36,7 @@
     },
     "DSCConfigurationUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-dsc-demo-app/dsc-configuration/windows-dsc-iis-app.ps1.zip",
+      "defaultValue": "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-dsc-demo-app/support-scripts/windows-dsc-iis-app.ps1.zip",
       "metadata": {
         "description": ""
       }

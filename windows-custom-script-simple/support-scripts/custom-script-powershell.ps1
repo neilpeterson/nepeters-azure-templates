@@ -1,5 +1,5 @@
 ﻿$cred = Get-Credential
-$script = "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-custom-script-simple/Create-File.ps1"
+$script = "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-custom-script-simple/support-scripts/Create-File.ps1"
 $run = "Create-File.ps1"
 $name = "scripttest"
 $location = "West US"
