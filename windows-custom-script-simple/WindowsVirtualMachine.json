@@ -241,7 +241,7 @@
                   "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "https://raw.githubusercontent.com/neilpeterson/azure_templates/master/windows-custom-script-simple/Create-File.ps1"
+                    "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-custom-script-simple/Create-File.ps1"
                   ],
                   "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File Create-File.ps1"
                 }
