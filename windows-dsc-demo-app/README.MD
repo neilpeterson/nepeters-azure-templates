@@ -1,12 +1,4 @@
-# Deployed pre-configured and monitored Docker host
-
-The following items are completed:
-
-- Deploy Ubuntu VM
-- Docker VM Extension installs Docker
-- Docker VM Extension deploys a container
-- Linux Custom Script Extension deploys the OMS agent and configures container monitoring
-
+# Deploys VM and Application using DSC Extension
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fneilpeterson%2Fnepeters-azure-templates%2Fmaster%2Fwindows-dsc-demo-app%2FWindowsVirtualMachine.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
