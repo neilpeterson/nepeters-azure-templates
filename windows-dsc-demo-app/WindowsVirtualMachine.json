@@ -47,8 +47,15 @@
       "metadata": {
         "description": ""
       }
-    }
     },
+    "vmName": {
+      "type": "string",
+      "defaultValue": "dscdemo",
+      "metadata": {
+        "description": ""
+      }
+    }
+  },
   "variables": {
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
@@ -61,7 +68,7 @@
     "publicIPAddressName": "myPublicIP",
     "publicIPAddressType": "Dynamic",
     "vhdStorageContainerName": "vhds",
-    "vmName": "MyWindowsVM",
+    "vmName": "[parameters('vmName')]",
     "vmSize": "Standard_A1",
     "virtualNetworkName": "MyVNET",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
