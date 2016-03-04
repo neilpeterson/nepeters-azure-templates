@@ -1,0 +1,36 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "linuxAdminUsername": {
+            "value": "azureuser"
+        },
+        "linuxAdminPassword": {
+            "value": "password"
+        },
+        "sshRSAPublicKey": {
+            "value": "SSHKey"
+        },
+        "windowsAdminUsername": {
+            "value": "azureuser"
+        },
+        "windowsAdminPassword": {
+            "value": "password"
+        },
+        "jumpboxEndpointDNSNamePrefix": {
+            "value": "jumpbox"
+        },
+        "masterEndpointDNSNamePrefix": {
+            "value": "master"
+        },
+        "agentEndpointDNSNamePrefix": {
+            "value": "agent"
+        },
+        "agentVMSize": {
+            "value": "Standard_A1"
+        },
+        "agentCount": {
+            "value": 1
+        }
+    }
+}
