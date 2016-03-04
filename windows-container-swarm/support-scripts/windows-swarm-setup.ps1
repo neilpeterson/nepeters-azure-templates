@@ -8,6 +8,7 @@ if (!(Test-Path -Path $swarmpath)) {
     New-Item -ItemType Directory -Path $swarmpath
 }
 
-Invoke-WebRequest -Method Get -Uri https://raw.githubusercontent.com/neilpeterson/azure-runbooks-and-scripts/master/windows-swarm-setup/swarm.exe -OutFile "$swarmpath\swarm.exe"
+Invoke-WebRequest -Method Get -Uri https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-container-swarm/support-scripts/swarm.exe -OutFile "$swarmpath\swarm.exe"
+
 Invoke-Expression -Command:$netsh
 Invoke-Expression -Command:$swarm

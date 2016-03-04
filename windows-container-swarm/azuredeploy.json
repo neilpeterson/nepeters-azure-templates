@@ -1191,7 +1191,7 @@
                             "autoUpgradeMinorVersion": true,
                           "settings": {
                             "fileUris": [
-                              "https://raw.githubusercontent.com/neilpeterson/azure-runbooks-and-scripts/master/windows-swarm-setup/windows-swarm-setup.ps1"
+                              "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-container-swarm/support-scripts/windows-swarm-setup.ps1"
                             ],
                             "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File windows-swarm-setup.ps1"
                           }
