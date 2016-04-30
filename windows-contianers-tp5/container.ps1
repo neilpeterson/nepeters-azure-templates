@@ -4,13 +4,13 @@ if ($feature.Installed -eq $false) {
     
     Install-WindowsFeature containers 
     
-    #$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\container.ps1"
-    #$trigger = New-ScheduledTaskTrigger -AtLogOn
-    #Register-ScheduledTask -TaskName "contianers" -Action $action -Trigger $trigger -RunLevel Highest | Out-Null
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\container.ps1"
+    $trigger = New-ScheduledTaskTrigger -AtLogOn
+    Register-ScheduledTask -TaskName "contianers" -Action $action -Trigger $trigger -RunLevel Highest | Out-Null
     Restart-Computer -Force      
 }
 
-#Unregister-ScheduledTask -TaskName contianers -Confirm:$false
+Unregister-ScheduledTask -TaskName contianers -Confirm:$false
 
 if (!(Get-ContainerImage -Name windowsservercore)) {
 
@@ -19,5 +19,5 @@ if (!(Get-ContainerImage -Name windowsservercore)) {
 }
 
 
-#Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1
-#.\update-containerhost.ps1
+Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1
+.\update-containerhost.ps1
