@@ -10,7 +10,7 @@ if ($feature.Installed -eq $false) {
     Restart-Computer -Force      
 }
 
-Unregister-ScheduledTask -TaskName contianers -Confirm:$false
+# Unregister-ScheduledTask -TaskName contianers -Confirm:$false
 
 if (!(Get-ContainerImage -Name windowsservercore)) {
 
@@ -19,5 +19,5 @@ if (!(Get-ContainerImage -Name windowsservercore)) {
 }
 
 
-Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1
-.\update-containerhost.ps1
+#Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1
+#.\update-containerhost.ps1
