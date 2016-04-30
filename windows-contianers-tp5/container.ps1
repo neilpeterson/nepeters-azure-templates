@@ -12,11 +12,11 @@ if ($feature.Installed -eq $false) {
 
 # Unregister-ScheduledTask -TaskName contianers -Confirm:$false
 
-if (!(Get-ContainerImage -Name windowsservercore)) {
+#if (!(Get-ContainerImage -Name windowsservercore)) {
 
     Install-PackageProvider ContainerImage -Force
     Install-ContainerImage -Name WindowsServerCore
-}
+#}
 
 
 #Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1
