@@ -6,7 +6,7 @@
     
     $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.8\Downloads\0\container.ps1"
     $trigger = New-ScheduledTaskTrigger -AtLogOn
-    Register-ScheduledTask -TaskName "contianers" -Action $action -Trigger $trigger -RunLevel Highest | Out-Null
+    Register-ScheduledTask -TaskName "contianers" -Action $action -Trigger $trigger -RunLevel Highest -User "system" | Out-Null
     Restart-Computer -Force      
 #}
 
