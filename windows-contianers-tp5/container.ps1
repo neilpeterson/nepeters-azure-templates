@@ -3,9 +3,9 @@ param (
 )
 
 
-$feature = Get-WindowsFeature -Name containers
+#$feature = Get-WindowsFeature -Name containers
 
-if ($feature.Installed -eq $false) {
+#if ($feature.Installed -eq $false) {
     
     Install-WindowsFeature containers    
 
@@ -15,7 +15,7 @@ if ($feature.Installed -eq $false) {
     $trigger = New-ScheduledTaskTrigger -AtLogOn
     Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User $adminUser | Out-Null
     Restart-Computer -Force      
-}
+#}
 
 function install-script {
 "# TP5 Contianer Installation`r`n
