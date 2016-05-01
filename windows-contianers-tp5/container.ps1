@@ -2,21 +2,6 @@ param (
 [string]$adminUser
 )
 
-
-#$feature = Get-WindowsFeature -Name containers
-
-#if ($feature.Installed -eq $false) {
-    
-    Install-WindowsFeature containers    
-
-    Install-Script > c:\images.ps1
-    
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\images.ps1"
-    $trigger = New-ScheduledTaskTrigger -AtLogOn
-    Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User $adminUser | Out-Null
-    Restart-Computer -Force      
-#}
-
 function install-script {
 "# TP5 Contianer Installation`r`n
     # Install Windows Server Core Image`r`n
@@ -27,3 +12,11 @@ function install-script {
     .\update-containerhost.ps1`r`n
     Unregister-ScheduledTask -TaskName scriptcontianers -Confirm:$false"
 }
+
+Install-Script > c:\images.ps1
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\images.ps1"
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User $adminUser | Out-Null
+
+Install-WindowsFeature containers
+Restart-Computer -Force      
