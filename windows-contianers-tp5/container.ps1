@@ -8,6 +8,6 @@ if ($feature.Installed -eq $false) {
     
     $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\images.ps1"
     $trigger = New-ScheduledTaskTrigger -AtLogOn
-    Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User "system" | Out-Null
+    Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User "neillocal" | Out-Null
     Restart-Computer -Force      
 }
