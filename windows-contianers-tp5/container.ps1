@@ -10,8 +10,8 @@ function install-script {
     # Install Docker daemon and client`r`n
     Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1`r
     .\update-containerhost.ps1`r`n
+    docker tag windowsservercore:10.0.14300.1000 windowsservercore:latest`r`n
     schtasks /DELETE /TN scriptcontianers /F
-    #Unregister-ScheduledTask -TaskName scriptcontianers -Confirm:$false"
 }
 
 Install-Script > c:\images.ps1
