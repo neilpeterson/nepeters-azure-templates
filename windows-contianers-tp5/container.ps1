@@ -1,6 +1,6 @@
-#param (
-#[string]$adminUser
-#)
+param (
+[string]$adminUser
+)
 
 function install-script {
 "   
@@ -19,7 +19,7 @@ schtasks /DELETE /TN scriptcontianers /F"
 Install-Script > c:\images.ps1
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\images.ps1"
 $trigger = New-ScheduledTaskTrigger -AtLogOn
-Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User neillocal | Out-Null
+Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User $adminUser | Out-Null
 
 Install-WindowsFeature containers
 Restart-Computer -Force      
