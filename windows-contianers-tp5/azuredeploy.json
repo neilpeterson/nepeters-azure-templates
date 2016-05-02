@@ -294,7 +294,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/windows-contianers-tp5/azure-containers.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File container.ps1 -adminuser ',parameters('adminUsername'))]"
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File azure-containers.ps1 -adminuser ',parameters('adminUsername'))]"
             }
           }
         }
