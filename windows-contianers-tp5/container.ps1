@@ -18,7 +18,7 @@ schtasks /DELETE /TN scriptcontianers /F"
 
 Install-Script > c:\images.ps1
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit c:\images.ps1"
-$trigger = New-ScheduledTaskTrigger -AtLogOn
+$trigger = New-ScheduledTaskTrigger -AtStartup
 Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $trigger -RunLevel Highest -User $adminUser | Out-Null
 
 Install-WindowsFeature containers
