@@ -10,3 +10,8 @@ $login.LoginType = 'SqlLogin'
 $login.PasswordPolicyEnforced = $false
 $login.PasswordExpirationEnabled = $false
 $login.Create($password)
+
+$server.Settings.LoginMode = [Microsoft.SqlServer.Management.Smo.ServerLoginMode]::Mixed
+$server.Alter()
+$server.Refresh()
+Restart-Service MSSQLSERVER
