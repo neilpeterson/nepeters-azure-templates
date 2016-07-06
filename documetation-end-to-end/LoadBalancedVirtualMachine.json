@@ -23,18 +23,6 @@
         "description": "Admin password"
       }
     },
-    "imageSKU": {
-      "type": "string",
-      "defaultValue": "2012-R2-Datacenter",
-      "allowedValues": [
-        "2008-R2-SP1",
-        "2012-Datacenter",
-        "2012-R2-Datacenter"
-      ],
-      "metadata": {
-        "description": "The Windows version for the VM"
-      }
-    },
     "numberOfInstances": {
       "type": "int",
       "minValue": 1,
@@ -50,28 +38,27 @@
   },
   "variables": {
     "vmSize": "Standard_D1",
-    "vmNamePrefix": "MyWindowsVM",
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
-    "availabilitySetName": "AvSet",
+    "availabilitySetName": "avalibility-set-front",
     "vhdStorageType": "Standard_LRS",
     "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "virtualNetworkName": "MyVNet",
+    "virtualNetworkName": "VirtualNetwork",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetfront": "subnetfront",
     "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
     "subnetback": "subnetback",
     "subnetRefback": "[concat(variables('vnetId'), '/subnets/', variables('subnetback'))]",
-    "networkInterfaceNamePrefixfront": "FrontVMNic",
-    "networkInterfaceNamePrefixback": "BackendVMNic",
-    "loadBalancerName": "BackendLB",
+    "networkInterfaceNamePrefixfront": "nic-front",
+    "networkInterfaceNamePrefixback": "nic-back",
+    "loadBalancerName": "load-balancer-front",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "diagnosticsStorageAccountName": "[variables('vhdStorageName')]",
     "diagnosticsStorageAccountResourceGroup": "[resourcegroup().name]",
     "accountid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('diagnosticsStorageAccountResourceGroup'), '/providers/', 'Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
-    "publicipaddressName": "publicipaddress",
-    "nsgfront": "nsgfront",
-    "nsgback": "nsgback"
+    "publicipaddressName": "public-ip-front",
+    "nsgfront": "nsg-front",
+    "nsgback": "nsg-back"
   },
   "resources": [
     {
@@ -80,7 +67,7 @@
       "name": "[variables('nsgfront')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "networksecuritygroupfront"
+        "displayName": "NSGFront"
       },
       "properties": {
         "securityRules": [
@@ -97,6 +84,20 @@
               "priority": 100,
               "direction": "Inbound"
             }
+          },
+          {
+            "name": "rdp",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
           }
         ]
       }
@@ -107,7 +108,7 @@
       "name": "[variables('nsgback')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "networksecuritygroupback"
+        "displayName": "NSGBack"
       },
       "properties": {
         "securityRules": [
@@ -146,7 +147,7 @@
       "name": "[variables('availabilitySetName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "AvailabilitySet"
+        "displayName": "AvailabilitySetFront"
       },
       "properties": {
       }
@@ -196,7 +197,7 @@
       "name": "[concat(variables('networkInterfaceNamePrefixfront'), copyindex())]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NetworkInterface"
+        "displayName": "NICFront"
       },
       "copy": {
         "name": "nicLoop",
@@ -237,7 +238,7 @@
       "name": "[variables('networkInterfaceNamePrefixback')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NetworkInterfaceback"
+        "displayName": "NICBack"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -250,7 +251,7 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('subnetRefback')]"
-              }              
+              }
             }
           }
         ]
@@ -262,7 +263,7 @@
       "name": "[variables('loadBalancerName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "LoadBalancer"
+        "displayName": "LoadBalancerFront"
       },
       "dependsOn": [
         "[variables('vnetId')]"
@@ -313,14 +314,14 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(variables('vmNamePrefix'), copyindex())]",
+      "name": "[parameters('vmname-front')]",
       "copy": {
         "name": "virtualMachineLoop",
         "count": "[parameters('numberOfInstances')]"
       },
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "VirtualMachines"
+        "displayName": "VMFront"
       },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
@@ -335,7 +336,7 @@
           "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[concat(variables('vmNamePrefix'), copyIndex())]",
+          "computerName": "[parameters('vmname-front')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -343,7 +344,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('imageSKU')]",
+            "sku": "Windows-Server-Technical-Preview",
             "version": "latest"
           },
           "osDisk": {
@@ -364,6 +365,30 @@
         }
       },
       "resources": [
+          {
+              "name": "config-app",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-06-15",
+              "dependsOn": [
+                  "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'))]"
+              ],
+              "tags": {
+                  "displayName": "config-app"
+              },
+              "properties": {
+                  "publisher": "Microsoft.Compute",
+                  "type": "CustomScriptExtension",
+                  "typeHandlerVersion": "1.4",
+                  "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": [
+                    "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
+                  ],
+                  "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
+                }
+              }
+          }
 
       ]
     },
@@ -373,10 +398,11 @@
       "name": "[parameters('vmname-back')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "VirtualMachinesback"
+        "displayName": "VMBack"
       },
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]"
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "NIC-Back"
       ],
       "properties": {
         "hardwareProfile": {
@@ -389,9 +415,9 @@
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('imageSKU')]",
+            "publisher": "MicrosoftSQLServer",
+            "offer": "SQL2016-WS2012R2",
+            "sku": "Express",
             "version": "latest"
           },
           "osDisk": {
@@ -412,6 +438,30 @@
         }
       },
       "resources": [
+          {
+              "name": "config-sql",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-06-15",
+              "dependsOn": [
+                  "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
+              ],
+              "tags": {
+                  "displayName": "config-sql"
+              },
+              "properties": {
+                  "publisher": "Microsoft.Compute",
+                  "type": "CustomScriptExtension",
+                  "typeHandlerVersion": "1.4",
+                  "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": [
+                    "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
+                  ],
+                  "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File config-sql.ps1 -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'))]"
+                }
+              }
+          }
 
       ]
     },
@@ -422,7 +472,7 @@
       "apiVersion": "2015-06-15",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "publicipaddress"
+        "displayName": "PIPFront"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",

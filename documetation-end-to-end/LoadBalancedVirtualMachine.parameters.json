@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "username"
+            "value": "neillocal"
         },
         "adminPassword": {
-            "value": "password"
+            "value": "Monkeyskip76"
         },
         "numberOfInstances": {
             "value": 1
         },
         "publicipaddressDnsName": {
-            "value": "dnsname"
+            "value": "e2esql03"
         },
         "vmname-front": {
-            "value": "frontvm"
+            "value": "frontvmtest"
         },
         "vmname-back": {
-            "value": "backvm"
+            "value": "backvmtest"
         }
     }
 }
