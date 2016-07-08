@@ -53,9 +53,6 @@
     "networkInterfaceNamePrefixback": "nic-back",
     "loadBalancerName": "load-balancer-front",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
-    "diagnosticsStorageAccountName": "[variables('vhdStorageName')]",
-    "diagnosticsStorageAccountResourceGroup": "[resourcegroup().name]",
-    "accountid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('diagnosticsStorageAccountResourceGroup'), '/providers/', 'Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
     "nsgback": "nsg-back"
@@ -67,7 +64,7 @@
       "name": "[variables('nsgfront')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NSGFront"
+        "displayName": "nsg-front"
       },
       "properties": {
         "securityRules": [
@@ -108,7 +105,7 @@
       "name": "[variables('nsgback')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NSGBack"
+        "displayName": "nsg-back"
       },
       "properties": {
         "securityRules": [
@@ -135,7 +132,7 @@
       "name": "[variables('vhdStorageName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "StorageAccount"
+        "displayName": "storage-account"
       },
       "properties": {
         "accountType": "[variables('vhdStorageType')]"
@@ -147,7 +144,7 @@
       "name": "[variables('availabilitySetName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "AvailabilitySetFront"
+        "displayName": "availability-set-font"
       },
       "properties": {
       }
@@ -161,7 +158,7 @@
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgfront'))]"
       ],
       "tags": {
-        "displayName": "VirtualNetwork"
+        "displayName": "virtual-network"
       },
       "properties": {
         "addressSpace": {
@@ -197,7 +194,7 @@
       "name": "[concat(variables('networkInterfaceNamePrefixfront'), copyindex())]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NICFront"
+        "displayName": "nic-frontront"
       },
       "copy": {
         "name": "nicLoop",
@@ -238,7 +235,7 @@
       "name": "[variables('networkInterfaceNamePrefixback')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "NICBack"
+        "displayName": "nic-back"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -263,7 +260,7 @@
       "name": "[variables('loadBalancerName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "LoadBalancerFront"
+        "displayName": "load-balancer-front"
       },
       "dependsOn": [
         "[variables('vnetId')]"
@@ -321,7 +318,7 @@
       },
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "VMFront"
+        "displayName": "vm-front"
       },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
@@ -374,7 +371,7 @@
                   "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'))]"
               ],
               "tags": {
-                  "displayName": "config-app"
+                  "displayName": "script-config-app"
               },
               "properties": {
                   "publisher": "Microsoft.Compute",
@@ -398,7 +395,7 @@
       "name": "[parameters('vmname-back')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "VMBack"
+        "displayName": "vm-back"
       },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
@@ -447,7 +444,7 @@
                   "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
               ],
               "tags": {
-                  "displayName": "config-sql"
+                  "displayName": "script-config-sql"
               },
               "properties": {
                   "publisher": "Microsoft.Compute",
@@ -472,7 +469,7 @@
       "apiVersion": "2015-06-15",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "PIPFront"
+        "displayName": "public-ip-front"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",

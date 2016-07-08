@@ -12,7 +12,7 @@
             "value": 1
         },
         "publicipaddressDnsName": {
-            "value": "e2esql03"
+            "value": "e2ecoresql01"
         },
         "vmname-front": {
             "value": "frontvmtest"
