@@ -110,16 +110,41 @@
       "properties": {
         "securityRules": [
           {
-            "name": "http",
+            "name": "block-all-inbound",
             "properties": {
-              "description": "http endpoint",
-              "protocol": "Tcp",
+              "protocol": "*",
               "sourcePortRange": "*",
-              "destinationPortRange": "80",
+              "destinationPortRange": "*",
               "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 500,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "sql-internal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1143",
+              "sourceAddressPrefix": "VirtualNetwork",
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "rdp-internal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
               "direction": "Inbound"
             }
           }
