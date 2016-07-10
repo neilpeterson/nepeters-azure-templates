@@ -3,6 +3,9 @@ Param (
     [string]$password
 )
 
+# firewall
+netsh advfirewall firewall add rule name="sql " dir=in action=allow protocol=TCP localport=1433
+
 Import-Module SQLPS -DisableNameChecking
 $server = new-Object Microsoft.SqlServer.Management.Smo.Server("(local)")
 $login = new-object Microsoft.SqlServer.Management.Smo.Login("(local)", $user)
