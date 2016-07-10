@@ -19,10 +19,19 @@ $login.AddToRole("sysadmin")
 $login.Alter()
 
 
-# enable tcp/ip protocol
+# changed login to mixed
 $server.Settings.LoginMode = [Microsoft.SqlServer.Management.Smo.ServerLoginMode]::Mixed
 $server.Alter()
 $server.Refresh()
+
+# enable tcpip
+
+$smo = 'Microsoft.SqlServer.Management.Smo.'
+$wmi = new-object ($smo + 'Wmi.ManagedComputer').
+$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='MSSQLSERVER']/ServerProtocol[@Name='Tcp']"
+$Tcp = $wmi.GetSmoObject($uri)
+$Tcp.IsEnabled = $true
+$Tcp.Alter()
 
 # restart sql
 Restart-Service MSSQLSERVER
