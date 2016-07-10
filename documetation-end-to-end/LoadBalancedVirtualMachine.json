@@ -127,7 +127,7 @@
             "properties": {
               "protocol": "*",
               "sourcePortRange": "*",
-              "destinationPortRange": "1143",
+              "destinationPortRange": "1433",
               "sourceAddressPrefix": "VirtualNetwork",
               "destinationAddressPrefix": "*",
               "access": "Allow",
