@@ -2,23 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "vmname-front": {
+            "value": "vmfront03"
+        },
+        "vmname-back": {
+            "value": "vmback03"
+        },
         "adminUsername": {
             "value": "neillocal"
-        },
-        "adminPassword": {
-            "value": "Monkeyskip76"
         },
         "numberOfInstances": {
             "value": 1
         },
         "publicipaddressDnsName": {
-            "value": "e2ecoresql01"
+            "value": "msrb01"
         },
-        "vmname-front": {
-            "value": "frontvmtest"
-        },
-        "vmname-back": {
-            "value": "backvmtest"
+        "adminPassword": {
+            "value": "Monkeyskip76"
         }
     }
 }

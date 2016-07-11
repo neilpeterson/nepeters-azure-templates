@@ -51,8 +51,12 @@
     "subnetRefback": "[concat(variables('vnetId'), '/subnets/', variables('subnetback'))]",
     "networkInterfaceNamePrefixfront": "nic-front",
     "networkInterfaceNamePrefixback": "nic-back",
+    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
     "loadBalancerName": "load-balancer-front",
+    "lbBackEndPool": "lbBackEndPool",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
+    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
+    "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
     "nsgback": "nsg-back"
@@ -219,7 +223,7 @@
       "name": "[concat(variables('networkInterfaceNamePrefixfront'), copyindex())]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "nic-frontront"
+        "displayName": "nic-front"
       },
       "copy": {
         "name": "nicLoop",
@@ -241,7 +245,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                  "id": "[concat(variables('lbId'), '/backendAddressPools/BackendPool1')]"
+                  "id": "[variables('lbPoolID')]"
                 }
               ],
               "loadBalancerInboundNatRules": [
@@ -303,7 +307,28 @@
         ],
         "backendAddressPools": [
           {
-            "name": "BackendPool1"
+            "name": "[variables('lbBackEndPool')]"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontend')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
           }
         ],
         "probes": [
@@ -387,30 +412,30 @@
         }
       },
       "resources": [
-          {
-              "name": "config-app",
-              "type": "extensions",
-              "location": "[resourceGroup().location]",
-              "apiVersion": "2015-06-15",
-              "dependsOn": [
-                  "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'))]"
+        {
+          "name": "config-app",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'))]"
+          ],
+          "tags": {
+            "displayName": "script-config-app"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
               ],
-              "tags": {
-                  "displayName": "script-config-app"
-              },
-              "properties": {
-                  "publisher": "Microsoft.Compute",
-                  "type": "CustomScriptExtension",
-                  "typeHandlerVersion": "1.4",
-                  "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "fileUris": [
-                    "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
-                  ],
-                  "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
-                }
-              }
+              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
+            }
           }
+        }
 
       ]
     },
@@ -460,30 +485,30 @@
         }
       },
       "resources": [
-          {
-              "name": "config-sql",
-              "type": "extensions",
-              "location": "[resourceGroup().location]",
-              "apiVersion": "2015-06-15",
-              "dependsOn": [
-                  "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
+        {
+          "name": "config-sql",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
+          ],
+          "tags": {
+            "displayName": "script-config-sql"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
               ],
-              "tags": {
-                  "displayName": "script-config-sql"
-              },
-              "properties": {
-                  "publisher": "Microsoft.Compute",
-                  "type": "CustomScriptExtension",
-                  "typeHandlerVersion": "1.4",
-                  "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "fileUris": [
-                    "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
-                  ],
-                  "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File config-sql.ps1 -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'))]"
-                }
-              }
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File config-sql.ps1 -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'))]"
+            }
           }
+        }
 
       ]
     },
