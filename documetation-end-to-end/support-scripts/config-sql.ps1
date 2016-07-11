@@ -1,6 +1,17 @@
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.PARAMETER Alias
+
+.EXAMPLE
+
+#>
+
 Param (
-    [string]$user,
-    [string]$password
+    [string]$user = "sqladmin",
+    [string]$password = "Password12"
 )
 
 # firewall
