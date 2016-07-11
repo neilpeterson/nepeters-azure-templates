@@ -505,7 +505,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File config-sql.ps1 -user ', parameters('adminUsername'), ' -password ', parameters('adminPassword'))]"
+              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File config-sql.ps1"
             }
           }
         }
