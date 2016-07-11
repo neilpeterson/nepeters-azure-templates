@@ -30,5 +30,5 @@ Expand-Archive C:\temp\musicstore.zip c:\
 # start music store app
 Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
-& "C:\Program Files\dotnet\dotnet.exe" run --server.urls=http://0.0.0.0:80
+#& "C:\Program Files\dotnet\dotnet.exe" run --server.urls=http://0.0.0.0:80
 
