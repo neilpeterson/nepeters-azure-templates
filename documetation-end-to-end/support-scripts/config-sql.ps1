@@ -4,7 +4,7 @@ Param (
 )
 
 # firewall
-netsh advfirewall firewall add rule name="sql " dir=in action=allow protocol=TCP localport=1433
+netsh advfirewall firewall add rule name="sql" dir=in action=allow protocol=TCP localport=1433
 
 Import-Module SQLPS -DisableNameChecking
 
