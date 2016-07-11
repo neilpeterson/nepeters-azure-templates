@@ -11,3 +11,10 @@ This in progress template will deploy two virtual machines, running the .NET Cor
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+# Details
+
+Command for launching kestrel on port 80:
+
+```none
+dotnet.exe run --server.urls=http://0.0.0.0:5000
+```
