@@ -16,9 +16,12 @@ Param (
 # firewall
 netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP localport=80
 
+#folders
+
+New-Item -ItemType Directory c:\temp
+New-Item -ItemType Directory c:\music
 
 # install dot.net core sdk
-New-Item -ItemType Directory c:\temp
 Invoke-WebRequest https://go.microsoft.com/fwlink/?LinkID=809122 -outfile c:\temp\DotNetCore.1.0.0-SDK.Preview2-x64.exe
 Start-Process c:\temp\DotNetCore.1.0.0-SDK.Preview2-x64.exe -ArgumentList '/quiet' -Wait
 
@@ -30,5 +33,6 @@ Expand-Archive C:\temp\musicstore.zip c:\
 # start music store app
 Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
+& "C:\Program Files\dotnet\dotnet.exe" build -o c:\music
 #& "C:\Program Files\dotnet\dotnet.exe" run --server.urls=http://0.0.0.0:80
 
