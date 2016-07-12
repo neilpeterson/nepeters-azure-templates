@@ -26,7 +26,7 @@
     "numberOfInstances": {
       "type": "int",
       "minValue": 1,
-      "defaultValue": 2,
+      "defaultValue": 1,
       "metadata": {
         "description": "Number of VM instances to be created behind internal load balancer control"
       }
@@ -53,6 +53,7 @@
     "networkInterfaceNamePrefixback": "nic-back",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
     "loadBalancerName": "load-balancer-front",
+    "loadBalencerRule" : "HTTP",
     "lbBackEndPool": "lbBackEndPool",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
@@ -250,7 +251,7 @@
               ],
               "loadBalancerInboundNatRules": [
                 {
-                  "id": "[concat(variables('lbID'),'/inboundNatRules/RDP')]"
+                  "id": "[concat(variables('lbID'),'/inboundNatRules/RDP-VM', copyIndex())]"
                 }
               ]
             }
@@ -312,7 +313,7 @@
         ],
         "loadBalancingRules": [
           {
-            "name": "LBRule",
+            "name": "[variables('loadBalencerRule')]",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontend')]"
@@ -341,27 +342,38 @@
             },
             "name": "lbprobe"
           }
-        ],
-        "inboundNatRules": [
-          {
-            "name": "RDP",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontend')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 3389,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          }
         ]
       }
     },
     {
       "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/loadBalancers/inboundNatRules",
+      "name": "[concat(variables('loadBalancerName'), '/', 'RDP-VM', copyIndex())]",
+      "tags": {
+        "displayName": "load-balancer-nat-rule"
+      },
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "lbNatLoop",
+        "count": "[parameters('numberOfInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+      ],
+      "properties": {
+        "frontendIPConfiguration": {
+          "id": "[variables('frontEndIPConfigID')]"
+        },
+        "protocol": "tcp",
+        "frontendPort": "[copyIndex(5000)]",
+        "backendPort": 3389,
+        "enableFloatingIP": false
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmname-front')]",
+      "name": "[concat(parameters('vmname-front'),copyindex())]",
       "copy": {
         "name": "virtualMachineLoop",
         "count": "[parameters('numberOfInstances')]"
@@ -383,7 +395,7 @@
           "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('vmname-front')]",
+          "computerName": "[concat(parameters('vmname-front'),copyindex())]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -418,7 +430,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'))]"
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'),copyindex())]"
           ],
           "tags": {
             "displayName": "script-config-app"

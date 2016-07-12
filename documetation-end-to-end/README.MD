@@ -1,20 +1,11 @@
 # Deploy Two Tier Application on Azure Virtual Machines
 
-This in progress template will deploy two virtual machines, running the .NET Core Music Store Application.
-
-![](./media/architecture.png)
+This template deploys a two tier demo application and all necessary infrastructural components. When deployed, the resulting resource group will contain a fully working, highly available, and secure application. Deploy the Azure resource group and application using the below button. Once completed, the application can be access on the Azure public IP address assigned in the resource group. 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fneilpeterson%2Fnepeters-azure-templates%2Fmaster%2Fdocumetation-end-to-end%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
-<a href="http://armviz.io/#/load=httpshttps%3A%2F%2Fraw.githubusercontent.com%2Fneilpeterson%2Fnepeters-azure-templates%2Fmaster%2Fdocumetation-end-to-end%2Fazuredeploy.json" target="_blank">
-    <img src="http://armviz.io/visualizebutton.png"/>
-</a>
 
-# Details
+The application architecture is similar to this:
 
-Command for launching kestrel on port 80:
-
-```none
-dotnet.exe run --server.urls=http://0.0.0.0:5000
-```
+![](./media/architecture.png)
