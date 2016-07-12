@@ -43,7 +43,7 @@
     "availabilitySetName": "avalibility-set-front",
     "vhdStorageType": "Standard_LRS",
     "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "virtualNetworkName": "VirtualNetwork",
+    "virtualNetworkName": "virtual-network",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetfront": "subnetfront",
     "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
