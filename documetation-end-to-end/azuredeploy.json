@@ -233,7 +233,8 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicipaddressName'))]"
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicipaddressName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatRules/', 'RDP-VM', copyIndex())]"
       ],
       "properties": {
         "ipConfigurations": [
