@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmname-front": {
-            "value": "vmfront03"
+            "value": "vm-front"
         },
         "vmname-back": {
-            "value": "vmback03"
+            "value": "vm-back"
         },
         "adminUsername": {
-            "value": "neillocal"
+            "value": "user"
         },
         "numberOfInstances": {
             "value": 1
         },
         "publicipaddressDnsName": {
-            "value": "msrb01"
+            "value": "dns-name"
         },
         "adminPassword": {
-            "value": "Monkeyskip76"
+            "value": "password"
         }
     }
 }

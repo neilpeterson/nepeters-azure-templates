@@ -43,7 +43,7 @@
     "availabilitySetName": "avalibility-set-front",
     "vhdStorageType": "Standard_LRS",
     "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "virtualNetworkName": "virtual-network",
+    "virtualNetworkName": "VirtualNetwork",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetfront": "subnetfront",
     "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
@@ -53,14 +53,15 @@
     "networkInterfaceNamePrefixback": "nic-back",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
     "loadBalancerName": "load-balancer-front",
-    "loadBalencerRule" : "HTTP",
+    "loadBalencerRule": "HTTP",
     "lbBackEndPool": "lbBackEndPool",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
     "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
-    "nsgback": "nsg-back"
+    "nsgback": "nsg-back",
+    "ip-address": "10.0.2.4"
   },
   "resources": [
     {
@@ -276,7 +277,8 @@
           {
             "name": "ipconfig1",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('ip-address')]",
               "subnet": {
                 "id": "[variables('subnetRefback')]"
               }
