@@ -6,10 +6,6 @@
       "type": "string",
       "minLength": 1
     },
-    "vmname-back": {
-      "type": "string",
-      "minLength": 1
-    },
     "adminUsername": {
       "type": "string",
       "minLength": 1,
@@ -34,7 +30,14 @@
     "publicipaddressDnsName": {
       "type": "string",
       "minLength": 1
-    }
+    },
+      "musicstoresqlAdminLogin": {
+          "type": "string",
+          "minLength": 1
+      },
+      "musicstoresqlAdminLoginPassword": {
+          "type": "securestring"
+      }
   },
   "variables": {
     "vmSize": "Standard_D1",
@@ -60,8 +63,10 @@
     "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
-    "nsgback": "nsg-back",
-    "ip-address": "10.0.2.4"
+    "ip-address": "10.0.2.4",
+    "musicstoresqlName": "[concat('musicstoresql', uniqueString(resourceGroup().id))]",
+    "sqladmin": "sqladmin",
+    "sqlpass": "Password12"
   },
   "resources": [
     {
@@ -96,58 +101,6 @@
               "sourcePortRange": "*",
               "destinationPortRange": "3389",
               "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 200,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('nsgback')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "nsg-back"
-      },
-      "properties": {
-        "securityRules": [
-          {
-            "name": "block-all-inbound",
-            "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Deny",
-              "priority": 500,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "sql-internal",
-            "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "1433",
-              "sourceAddressPrefix": "VirtualNetwork",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "rdp-internal",
-            "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "3389",
-              "sourceAddressPrefix": "VirtualNetwork",
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 200,
@@ -256,32 +209,6 @@
                   "id": "[concat(variables('lbID'),'/inboundNatRules/RDP-VM', copyIndex())]"
                 }
               ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('networkInterfaceNamePrefixback')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "nic-back"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[variables('ip-address')]",
-              "subnet": {
-                "id": "[variables('subnetRefback')]"
-              }
             }
           }
         ]
@@ -455,79 +382,6 @@
       ]
     },
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmname-back')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "vm-back"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
-        "NIC-Back"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[parameters('vmname-back')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftSQLServer",
-            "offer": "SQL2016-WS2012R2",
-            "sku": "Express",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "osdiskback",
-            "vhd": {
-              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/vhds/', 'osdiskback', '.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefixback')))]"
-            }
-          ]
-        }
-      },
-      "resources": [
-        {
-          "name": "config-sql",
-          "type": "extensions",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
-          ],
-          "tags": {
-            "displayName": "script-config-sql"
-          },
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.4",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
-              ],
-              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File config-sql.ps1"
-            }
-          }
-        }
-
-      ]
-    },
-    {
       "name": "[variables('publicipaddressName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
@@ -542,6 +396,35 @@
           "domainNameLabel": "[parameters('publicipaddressDnsName')]"
         }
       }
-    }
+    },
+      {
+          "name": "[variables('musicstoresqlName')]",
+          "type": "Microsoft.Sql/servers",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [ ],
+          "tags": {
+              "displayName": "musicstoresql"
+          },
+          "properties": {
+              "administratorLogin": "[parameters('musicstoresqlAdminLogin')]",
+              "administratorLoginPassword": "[parameters('musicstoresqlAdminLoginPassword')]"
+          },
+          "resources": [
+              {
+                  "name": "AllowAllWindowsAzureIps",
+                  "type": "firewallrules",
+                  "location": "[resourceGroup().location]",
+                  "apiVersion": "2014-04-01-preview",
+                  "dependsOn": [
+                      "[concat('Microsoft.Sql/servers/', variables('musicstoresqlName'))]"
+                  ],
+                  "properties": {
+                      "startIpAddress": "0.0.0.0",
+                      "endIpAddress": "0.0.0.0"
+                  }
+              }
+          ]
+      }
   ]
 }
