@@ -32,7 +32,7 @@ Invoke-WebRequest https://go.microsoft.com/fwlink/?LinkId=817246 -outfile c:\tem
 Start-Process c:\temp\DotNetCore.WindowsHosting.exe -ArgumentList '/quiet' -Wait
 
 # download music app
-Invoke-WebRequest  https://github.com/neilpeterson/nepeters-azure-templates/blob/master/dotnet-core-music-vm-sql-db/music-app/music-store-azure-demo.zip -OutFile c:\temp\musicstore.zip
+Invoke-WebRequest  https://github.com/neilpeterson/nepeters-azure-templates/raw/master/dotnet-core-music-vm-sql-db/music-app/music-store-azure-demo.zip -OutFile c:\temp\musicstore.zip
 Expand-Archive C:\temp\musicstore.zip c:\
 
 # start music store app
