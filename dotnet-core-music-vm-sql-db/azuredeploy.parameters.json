@@ -3,19 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmname-front": {
-            "value": "vm-front"
-        },
-        "vmname-back": {
-            "value": "vm-back"
+            "value": "vmname"
         },
         "adminUsername": {
-            "value": "user"
-        },
-        "numberOfInstances": {
-            "value": 1
+            "value": "adminuser"
         },
         "publicipaddressDnsName": {
-            "value": "dns-name"
+            "value": "dnsname"
         },
         "adminPassword": {
             "value": "password"

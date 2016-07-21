@@ -30,14 +30,7 @@
     "publicipaddressDnsName": {
       "type": "string",
       "minLength": 1
-    },
-      "musicstoresqlAdminLogin": {
-          "type": "string",
-          "minLength": 1
-      },
-      "musicstoresqlAdminLoginPassword": {
-          "type": "securestring"
-      }
+    }
   },
   "variables": {
     "vmSize": "Standard_D1",
@@ -64,7 +57,7 @@
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
     "ip-address": "10.0.2.4",
-    "musicstoresqlName": "[concat('musicstoresql', uniqueString(resourceGroup().id))]",
+    "musicstoresqlName": "musicstoresql",
     "sqladmin": "sqladmin",
     "sqlpass": "Password12"
   },
@@ -159,15 +152,6 @@
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgfront'))]"
               }
             }
-          },
-          {
-            "name": "[variables('subnetback')]",
-            "properties": {
-              "addressPrefix": "10.0.2.0/24",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgback'))]"
-              }
-            }
           }
         ]
       }
@@ -223,7 +207,8 @@
         "displayName": "load-balancer-front"
       },
       "dependsOn": [
-        "[variables('vnetId')]"
+        "[variables('vnetId')]",
+        "[variables('publicipaddressName')]"
       ],
       "properties": {
         "frontendIPConfigurations": [
@@ -360,7 +345,8 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'),copyindex())]"
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'),copyindex())]",
+            "[variables('musicstoresqlName')]"
           ],
           "tags": {
             "displayName": "script-config-app"
@@ -372,7 +358,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-vm-sql-db/support-scripts/configure-music-app.ps1"
               ],
               "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
             }
@@ -397,34 +383,34 @@
         }
       }
     },
-      {
-          "name": "[variables('musicstoresqlName')]",
-          "type": "Microsoft.Sql/servers",
+    {
+      "name": "[variables('musicstoresqlName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "musicstoresql"
+      },
+      "properties": {
+        "administratorLogin": "[variables('sqladmin')]",
+        "administratorLoginPassword": "[variables('sqlpass')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
           "location": "[resourceGroup().location]",
           "apiVersion": "2014-04-01-preview",
-          "dependsOn": [ ],
-          "tags": {
-              "displayName": "musicstoresql"
-          },
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('musicstoresqlName'))]"
+          ],
           "properties": {
-              "administratorLogin": "[parameters('musicstoresqlAdminLogin')]",
-              "administratorLoginPassword": "[parameters('musicstoresqlAdminLoginPassword')]"
-          },
-          "resources": [
-              {
-                  "name": "AllowAllWindowsAzureIps",
-                  "type": "firewallrules",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2014-04-01-preview",
-                  "dependsOn": [
-                      "[concat('Microsoft.Sql/servers/', variables('musicstoresqlName'))]"
-                  ],
-                  "properties": {
-                      "startIpAddress": "0.0.0.0",
-                      "endIpAddress": "0.0.0.0"
-                  }
-              }
-          ]
-      }
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        }
+      ]
+    }
   ]
 }
