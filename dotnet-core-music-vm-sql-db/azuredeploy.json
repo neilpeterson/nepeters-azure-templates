@@ -1,0 +1,547 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmname-front": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vmname-back": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adminUsername": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Admin username"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+    },
+    "numberOfInstances": {
+      "type": "int",
+      "minValue": 1,
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of VM instances to be created behind internal load balancer control"
+      }
+    },
+    "publicipaddressDnsName": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "variables": {
+    "vmSize": "Standard_D1",
+    "imagePublisher": "MicrosoftWindowsServer",
+    "imageOffer": "WindowsServer",
+    "availabilitySetName": "avalibility-set-front",
+    "vhdStorageType": "Standard_LRS",
+    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
+    "virtualNetworkName": "VirtualNetwork",
+    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetfront": "subnetfront",
+    "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
+    "subnetback": "subnetback",
+    "subnetRefback": "[concat(variables('vnetId'), '/subnets/', variables('subnetback'))]",
+    "networkInterfaceNamePrefixfront": "nic-front",
+    "networkInterfaceNamePrefixback": "nic-back",
+    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+    "loadBalancerName": "load-balancer-front",
+    "loadBalencerRule": "HTTP",
+    "lbBackEndPool": "lbBackEndPool",
+    "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
+    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
+    "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
+    "publicipaddressName": "public-ip-front",
+    "nsgfront": "nsg-front",
+    "nsgback": "nsg-back",
+    "ip-address": "10.0.2.4"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgfront')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nsg-front"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "http",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "rdp",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgback')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nsg-back"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "block-all-inbound",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 500,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "sql-internal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "rdp-internal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('vhdStorageName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "storage-account"
+      },
+      "properties": {
+        "accountType": "[variables('vhdStorageType')]"
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "availability-set-font"
+      },
+      "properties": {
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgfront'))]"
+      ],
+      "tags": {
+        "displayName": "virtual-network"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetfront')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgfront'))]"
+              }
+            }
+          },
+          {
+            "name": "[variables('subnetback')]",
+            "properties": {
+              "addressPrefix": "10.0.2.0/24",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgback'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('networkInterfaceNamePrefixfront'), copyindex())]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nic-front"
+      },
+      "copy": {
+        "name": "nicLoop",
+        "count": "[parameters('numberOfInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicipaddressName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatRules/', 'RDP-VM', copyIndex())]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetRefront')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[variables('lbPoolID')]"
+                }
+              ],
+              "loadBalancerInboundNatRules": [
+                {
+                  "id": "[concat(variables('lbID'),'/inboundNatRules/RDP-VM', copyIndex())]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('networkInterfaceNamePrefixback')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nic-back"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('ip-address')]",
+              "subnet": {
+                "id": "[variables('subnetRefback')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[variables('loadBalancerName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "load-balancer-front"
+      },
+      "dependsOn": [
+        "[variables('vnetId')]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicipaddressName'))]"
+              }
+            },
+            "name": "LoadBalancerFrontend"
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('lbBackEndPool')]"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "[variables('loadBalencerRule')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontend')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "properties": {
+              "protocol": "Tcp",
+              "port": 80,
+              "intervalInSeconds": 15,
+              "numberOfProbes": 2
+            },
+            "name": "lbprobe"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/loadBalancers/inboundNatRules",
+      "name": "[concat(variables('loadBalancerName'), '/', 'RDP-VM', copyIndex())]",
+      "tags": {
+        "displayName": "load-balancer-nat-rule"
+      },
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "lbNatLoop",
+        "count": "[parameters('numberOfInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+      ],
+      "properties": {
+        "frontendIPConfiguration": {
+          "id": "[variables('frontEndIPConfigID')]"
+        },
+        "protocol": "tcp",
+        "frontendPort": "[copyIndex(5000)]",
+        "backendPort": 3389,
+        "enableFloatingIP": false
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmname-front'),copyindex())]",
+      "copy": {
+        "name": "virtualMachineLoop",
+        "count": "[parameters('numberOfInstances')]"
+      },
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "vm-front"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "nicLoop",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmname-front'),copyindex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "Windows-Server-Technical-Preview",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/vhds/', 'osdisk', copyindex(), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefixfront'), copyindex()))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "config-app",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'),copyindex())]"
+          ],
+          "tags": {
+            "displayName": "script-config-app"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
+              ],
+              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
+            }
+          }
+        }
+
+      ]
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmname-back')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "vm-back"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "NIC-Back"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmname-back')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftSQLServer",
+            "offer": "SQL2016-WS2012R2",
+            "sku": "Express",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdiskback",
+            "vhd": {
+              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/vhds/', 'osdiskback', '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefixback')))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "config-sql",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-back'))]"
+          ],
+          "tags": {
+            "displayName": "script-config-sql"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
+              ],
+              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File config-sql.ps1"
+            }
+          }
+        }
+
+      ]
+    },
+    {
+      "name": "[variables('publicipaddressName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "public-ip-front"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('publicipaddressDnsName')]"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmname-front": {
+            "value": "vm-front"
+        },
+        "vmname-back": {
+            "value": "vm-back"
+        },
+        "adminUsername": {
+            "value": "user"
+        },
+        "numberOfInstances": {
+            "value": 1
+        },
+        "publicipaddressDnsName": {
+            "value": "dns-name"
+        },
+        "adminPassword": {
+            "value": "password"
+        }
+    }
+}
