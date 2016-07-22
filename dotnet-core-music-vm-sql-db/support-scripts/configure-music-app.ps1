@@ -52,3 +52,4 @@ Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 & iisreset
+& iisreset
