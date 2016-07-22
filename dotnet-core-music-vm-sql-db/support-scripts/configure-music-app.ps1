@@ -51,5 +51,5 @@ Set-Location C:\music-store-azure-demo\src\MusicStore\
 Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
-& iisreset
+start-sleep 120
 & iisreset
