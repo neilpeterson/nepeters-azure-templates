@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -57,9 +57,7 @@
     "publicipaddressName": "public-ip-front",
     "nsgfront": "nsg-front",
     "ip-address": "10.0.2.4",
-    "musicstoresqlName": "musicstoresql",
-    "sqladmin": "sqladmin",
-    "sqlpass": "Password12"
+    "musicstoresqlName": "[concat('sql-musicstore-', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -360,7 +358,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-vm-sql-db/support-scripts/configure-music-app.ps1"
               ],
-              "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1 -user ',parameters('adminUsername'),' -password ',parameters('adminPassword'),' -sqlserver ',variables('musicstoresqlName'),'.database.windows.net')]"
             }
           }
         }
@@ -390,15 +388,15 @@
       "apiVersion": "2014-04-01-preview",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "musicstoresql"
+        "displayName": "sql-music-store"
       },
       "properties": {
-        "administratorLogin": "[variables('sqladmin')]",
-        "administratorLoginPassword": "[variables('sqlpass')]"
+        "administratorLogin": "[parameters('adminUsername')]",
+        "administratorLoginPassword": "[parameters('adminPassword')]"
       },
       "resources": [
         {
-          "name": "AllowAllWindowsAzureIps",
+          "name": "firewall-allow-azure",
           "type": "firewallrules",
           "location": "[resourceGroup().location]",
           "apiVersion": "2014-04-01-preview",
