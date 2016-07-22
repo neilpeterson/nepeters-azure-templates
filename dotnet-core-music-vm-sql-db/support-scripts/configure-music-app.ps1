@@ -11,12 +11,15 @@
 
 Param (
 
+    [string]$user,
+    [string]$password,
+    [string]$sqlserver
 )
 
 # firewall
 netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP localport=80
 
-#folders
+# folders
 
 New-Item -ItemType Directory c:\temp
 New-Item -ItemType Directory c:\music
@@ -35,6 +38,12 @@ Start-Process c:\temp\DotNetCore.WindowsHosting.exe -ArgumentList '/quiet' -Wait
 Invoke-WebRequest  https://github.com/neilpeterson/nepeters-azure-templates/raw/master/dotnet-core-music-vm-sql-db/music-app/music-store-azure-demo.zip -OutFile c:\temp\musicstore.zip
 Expand-Archive C:\temp\musicstore.zip c:\
 
+# update SQL connection string
+
+$configfile = New-Item 'c:\music-store-azure-demo\src\MusicStore\config.json'
+$string = '{"AppSettings": { "SiteTitle": "ASP.NET MVC Music Store", "CacheDbResults": true }, "Data": { "DefaultConnection": { "ConnectionString": "Server=' + $sqlserver + ';Database=MusicStore;Integrated Security=False;User Id=' + $user + ';Password=' + $password + ';MultipleActiveResultSets=True;Connect Timeout=30" } } }'
+Add-Content $configfile $string
+
 # start music store app
 Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
@@ -43,4 +52,3 @@ Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 & iisreset
-
