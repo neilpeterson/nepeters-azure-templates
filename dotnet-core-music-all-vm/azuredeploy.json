@@ -445,7 +445,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/configure-music-app.ps1"
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-all-vm/support-scripts/configure-music-app.ps1"
               ],
               "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1"
             }
@@ -518,7 +518,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/documetation-end-to-end/support-scripts/config-sql.ps1"
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-all-vm/support-scripts/config-sql.ps1"
               ],
               "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File config-sql.ps1"
             }
