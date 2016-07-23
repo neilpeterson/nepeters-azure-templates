@@ -45,11 +45,11 @@ $string = '{"AppSettings": { "SiteTitle": "ASP.NET MVC Music Store", "CacheDbRes
 Add-Content $configfile $string
 
 # start music store app
-Set-Location C:\music-store-azure-demo\src\MusicStore\
-& "C:\Program Files\dotnet\dotnet.exe" restore
-& "C:\Program Files\dotnet\dotnet.exe" publish -o c:\music
-Remove-WebSite -Name "Default Web Site"
-Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
-New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
-start-sleep 120
-& iisreset
+#Set-Location C:\music-store-azure-demo\src\MusicStore\
+#& "C:\Program Files\dotnet\dotnet.exe" restore
+#& "C:\Program Files\dotnet\dotnet.exe" publish -o c:\music
+#Remove-WebSite -Name "Default Web Site"
+#Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
+#New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
+#start-sleep 120
+#& iisreset
