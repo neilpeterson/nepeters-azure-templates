@@ -24,9 +24,6 @@ netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP
 New-Item -ItemType Directory c:\temp
 New-Item -ItemType Directory c:\music
 
-# install iis
-
-Install-WindowsFeature web-server -IncludeManagementTools
 
 # install dot.net core sdk
 Invoke-WebRequest https://go.microsoft.com/fwlink/?LinkID=809122 -outfile c:\temp\DotNetCore.1.0.0-SDK.Preview2-x64.exe
@@ -48,9 +45,13 @@ Add-Content $configfile $string
 Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
 & "C:\Program Files\dotnet\dotnet.exe" publish -o c:\music
+
+# install iis
+
+Install-WindowsFeature web-server -IncludeManagementTools
+
 Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 start-sleep 120
 & iisreset
-restart-service W3SVC -Force
