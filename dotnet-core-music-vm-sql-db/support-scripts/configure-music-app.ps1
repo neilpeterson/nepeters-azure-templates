@@ -53,5 +53,3 @@ Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 start-sleep 120
 & iisreset
-
-restart-computer
