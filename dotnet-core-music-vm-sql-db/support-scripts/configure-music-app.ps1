@@ -37,7 +37,6 @@ Invoke-WebRequest  https://github.com/neilpeterson/nepeters-azure-templates/raw/
 Expand-Archive C:\temp\musicstore.zip c:\
 
 # update SQL connection string
-
 $configfile = New-Item 'c:\music-store-azure-demo\src\MusicStore\config.json'
 $string = '{"AppSettings": { "SiteTitle": "ASP.NET MVC Music Store", "CacheDbResults": true }, "Data": { "DefaultConnection": { "ConnectionString": "Server=' + $sqlserver + ';Database=MusicStore;Integrated Security=False;User Id=' + $user + ';Password=' + $password + ';MultipleActiveResultSets=True;Connect Timeout=30" } } }'
 Add-Content $configfile $string
@@ -47,9 +46,14 @@ Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
 & "C:\Program Files\dotnet\dotnet.exe" publish -o c:\music
 
+# update web.config
+$current = "dotnet"
+$replace = 'c:\Program Files\dotnet\dotnet.exe'
+$file = "c:\music2\web.config"
+(get-content $file) | foreach-object {$_ -replace $current, $replace} | set-content $file
+
 # config iis
 Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 & iisreset
-& shutdown.exe /r /t 30
