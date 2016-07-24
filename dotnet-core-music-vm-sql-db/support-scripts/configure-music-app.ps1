@@ -49,7 +49,7 @@ Set-Location C:\music-store-azure-demo\src\MusicStore\
 # update web.config
 $current = "dotnet"
 $replace = 'c:\Program Files\dotnet\dotnet.exe'
-$file = "c:\music2\web.config"
+$file = "c:\music\web.config"
 (get-content $file) | foreach-object {$_ -replace $current, $replace} | set-content $file
 
 # config iis
