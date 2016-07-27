@@ -1,0 +1,16 @@
+{
+  "AppSettings": {
+    "SiteTitle": "ASP.NET MVC Music Store",
+    "CacheDbResults": true
+  },
+  "DefaultAdminUsername": "Administrator@test.com",
+  "DefaultAdminPassword": "YouShouldChangeThisPassword1!",
+  "Data": {
+    "DefaultConnection": {
+      // Use a shared (and running) LocalDB database when executing in IIS e.g.
+      // "ConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=MusicStore;Trusted_Connection=True;MultipleActiveResultSets=true;Connect Timeout=30;"
+      // Set to use default SA account and password from: https://github.com/PatrickLang/Dockerfiles-for-windows/tree/master/sqlexpress
+      "ConnectionString": "Server=linuxmusicstore.database.windows.net;Database=MusicStore;Integrated Security=False;User Id=neillocal;Password=Monkeyskip76;MultipleActiveResultSets=True;Connect Timeout=30"
+    }
+  }
+}
