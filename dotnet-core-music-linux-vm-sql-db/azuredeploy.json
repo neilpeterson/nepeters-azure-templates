@@ -10,13 +10,13 @@
       "type": "string",
       "minLength": 1,
       "metadata": {
-        "description": "Admin username"
+        "description": "User name for the Virtual Machine."
       }
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "Admin password"
+        "description": "Password for the Virtual Machine."
       }
     },
     "numberOfInstances": {
@@ -29,34 +29,50 @@
     },
     "publicipaddressDnsName": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "metadata": {
+        "description": "Globally unique DNS Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "ubuntuOSVersion": {
+      "type": "string",
+      "defaultValue": "14.04.2-LTS",
+      "allowedValues": [
+        "12.04.5-LTS",
+        "14.04.2-LTS"
+      ],
+      "metadata": {
+        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version. Allowed values: 12.04.5-LTS, 14.04.2-LTS, 15.04."
+      }
     }
   },
   "variables": {
-    "vmSize": "Standard_D1",
-    "imagePublisher": "MicrosoftWindowsServer",
-    "imageOffer": "WindowsServer",
+    "imagePublisher": "Canonical",
+    "imageOffer": "UbuntuServer",
     "availabilitySetName": "avalibility-set-front",
-    "vhdStorageType": "Standard_LRS",
-    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "virtualNetworkName": "VirtualNetwork",
-    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "OSDiskName": "osdiskforlinuxsimple",
+    "nicName": "myVMNic",
+    "subnetName": "Subnet",
     "subnetfront": "subnetfront",
     "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
-    "subnetback": "subnetback",
-    "subnetRefback": "[concat(variables('vnetId'), '/subnets/', variables('subnetback'))]",
     "networkInterfaceNamePrefixfront": "nic-front",
-    "networkInterfaceNamePrefixback": "nic-back",
-    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+    "vhdStorageType": "Standard_LRS",
+    "publicipaddressName": "public-ip-front",
     "loadBalancerName": "load-balancer-front",
     "loadBalencerRule": "HTTP",
     "lbBackEndPool": "lbBackEndPool",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
     "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
-    "publicipaddressName": "public-ip-front",
+    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+    "vhdStorageContainerName": "vhds",
+    "vmName": "MyUbuntuVM",
+    "vmSize": "Standard_D1",
+    "virtualNetworkName": "MyVNET",
+    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
     "nsgfront": "nsg-front",
-    "ip-address": "10.0.2.4",
     "musicstoresqlName": "[concat('sql-musicstore-', uniqueString(resourceGroup().id))]"
   },
   "resources": [
@@ -85,12 +101,12 @@
             }
           },
           {
-            "name": "rdp",
+            "name": "ssh",
             "properties": {
               "description": "http endpoint",
               "protocol": "Tcp",
               "sourcePortRange": "*",
-              "destinationPortRange": "3389",
+              "destinationPortRange": "22",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
@@ -102,9 +118,9 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('vhdStorageName')]",
+      "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "storage-account"
@@ -115,13 +131,17 @@
     },
     {
       "apiVersion": "2015-06-15",
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('availabilitySetName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicipaddressName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "availability-set-font"
+        "displayName": "public-ip-front"
       },
       "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('publicipaddressDnsName')]"
+        }
       }
     },
     {
@@ -170,7 +190,7 @@
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicipaddressName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatRules/', 'RDP-VM', copyIndex())]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatRules/', 'SSH-VM', copyIndex())]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -188,7 +208,7 @@
               ],
               "loadBalancerInboundNatRules": [
                 {
-                  "id": "[concat(variables('lbID'),'/inboundNatRules/RDP-VM', copyIndex())]"
+                  "id": "[concat(variables('lbID'),'/inboundNatRules/SSH-VM', copyIndex())]"
                 }
               ]
             }
@@ -261,7 +281,7 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/loadBalancers/inboundNatRules",
-      "name": "[concat(variables('loadBalancerName'), '/', 'RDP-VM', copyIndex())]",
+      "name": "[concat(variables('loadBalancerName'), '/', 'SSH-VM', copyIndex())]",
       "tags": {
         "displayName": "load-balancer-nat-rule"
       },
@@ -279,7 +299,7 @@
         },
         "protocol": "tcp",
         "frontendPort": "[copyIndex(5000)]",
-        "backendPort": 3389,
+        "backendPort": 22,
         "enableFloatingIP": false
       }
     },
@@ -301,9 +321,6 @@
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
       ],
       "properties": {
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
-        },
         "hardwareProfile": {
           "vmSize": "[variables('vmSize')]"
         },
@@ -316,7 +333,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "Windows-Server-Technical-Preview",
+            "sku": "[parameters('ubuntuOSVersion')]",
             "version": "latest"
           },
           "osDisk": {
@@ -335,50 +352,20 @@
             }
           ]
         }
-      },
-      "resources": [
-        {
-          "name": "config-app",
-          "type": "extensions",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmname-front'),copyindex())]",
-            "[variables('musicstoresqlName')]"
-          ],
-          "tags": {
-            "displayName": "script-config-app"
-          },
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.4",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-vm-sql-db/support-scripts/configure-music-app.ps1"
-              ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File configure-music-app.ps1 -user ',parameters('adminUsername'),' -password ',parameters('adminPassword'),' -sqlserver ',variables('musicstoresqlName'),'.database.windows.net')]"
-            }
-          }
-        }
-
-      ]
+      }
     },
     {
-      "name": "[variables('publicipaddressName')]",
-      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('availabilitySetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "public-ip-front"
+        "displayName": "avalibility-set-front"
       },
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[parameters('publicipaddressDnsName')]"
-        }
+        "platformUpdateDomainCount": 1,
+        "platformFaultDomainCount": 1
       }
     },
     {
