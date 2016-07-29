@@ -6,4 +6,4 @@ sudo apt-get install -y dotnet-dev-1.0.0-preview2-003121
 sudo apt-get install -y git
 sudo apt-get install -y nginx
 sudo service nginx start
-sudo git clone https://github.com/neilpeterson/dotnet-linux-music.git ./music
+sudo git clone https://github.com/neilpeterson/dotnet-linux-music.git /music
