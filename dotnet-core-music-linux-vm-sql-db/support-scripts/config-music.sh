@@ -8,7 +8,8 @@ sudo apt-get install -y nginx
 sudo service nginx start
 sudo git clone https://github.com/neilpeterson/dotnet-linux-music.git /music
 sudo dotnet restore /music/src/MusicStore.Standalone
-sudo dotnet run /music/src/MusicStore.Standalone
 sudo rm -f /etc/nginx/sites-available/default
 sudo wget https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/default /etc/nginx/sites-enabled
 sudo nginx -s reload
+cd /music/src/MusicStore.Standalone
+sudo dotnet run
