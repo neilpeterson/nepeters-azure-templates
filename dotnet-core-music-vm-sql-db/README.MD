@@ -1,4 +1,4 @@
-# Deploy Two Tier Application on Azure Virtual Machines
+# Deploy Two Tier Application on Windows and Azure SQL DB
 
 This template deploys a two tier demo application and all necessary infrastructural components. When deployed, the resulting resource group will contain a fully working, highly available, and secure application. Deploy the Azure resource group and application using the below button. Once completed, the application can be access on the Azure public IP address assigned in the resource group. 
 
