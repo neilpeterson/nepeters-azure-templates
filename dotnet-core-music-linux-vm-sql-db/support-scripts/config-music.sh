@@ -3,7 +3,7 @@ sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotne
 sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
 sudo apt-get update
 sudo apt-get install dotnet-dev-1.0.0-preview2-003121
-sudo apt-get install git
-sudo apt-get install nginx
+sudo apt-get install -y git
+sudo apt-get install -y nginx
 sudo service nginx start
 sudo git clone https://github.com/neilpeterson/dotnet-linux-music.git ./music
