@@ -3,10 +3,10 @@
 # install dotnet core
 sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
 sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+sudo apt-get update
 sudo apt-get install -y dotnet-dev-1.0.0-preview2-003121
 
-# install NGINX
-sudo apt-get update
+# install nginx
 sudo apt-get install -y nginx
 sudo service nginx start
 
@@ -15,10 +15,16 @@ sudo wget https://raw.github.com/neilpeterson/nepeters-azure-templates/master/do
 sudo mkdir /music
 sudo tar -xf music-store-azure-demo.tar -C /music
 
-# upate config files
+# upate nginx config files
 sudo rm -f /etc/nginx/sites-available/default
 sudo cp /music/nginx-config/default /etc/nginx/sites-available/
-# need to add somehthing to update server, creds
+
+
+# update music config file
+sed -i 's/<replaceserver>/$1/g' /music/src/MusicStore/config.json
+sed -i 's/<replaceuser>/$2/g' /music/src/MusicStore/config.json
+sed -i 's/<replacepass>/$3/g' /music/src/MusicStore/config.json
+ 
 
 #start application
 #sudo nginx -s reload
