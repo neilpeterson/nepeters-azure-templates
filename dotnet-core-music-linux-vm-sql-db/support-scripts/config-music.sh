@@ -21,9 +21,9 @@ sudo cp /music/nginx-config/default /etc/nginx/sites-available/
 
 
 # update music config file
-sed -i 's/<replaceserver>/${1}/g' /music/src/MusicStore/config.json
-sed -i 's/<replaceuser>/${2}/g' /music/src/MusicStore/config.json
-sed -i 's/<replacepass>/${3}/g' /music/src/MusicStore/config.json
+sed -i 's/<replaceserver>/"${1}"/g' /music/src/MusicStore/config.json
+sed -i 's/<replaceuser>/"${2}"/g' /music/src/MusicStore/config.json
+sed -i 's/<replacepass>/"${3}"/g' /music/src/MusicStore/config.json
  
 
 #start application
