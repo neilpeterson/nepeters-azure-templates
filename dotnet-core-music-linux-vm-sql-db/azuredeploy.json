@@ -33,22 +33,12 @@
       "metadata": {
         "description": "Globally unique DNS Name for the Public IP used to access the Virtual Machine."
       }
-    },
-    "ubuntuOSVersion": {
-      "type": "string",
-      "defaultValue": "14.04.2-LTS",
-      "allowedValues": [
-        "12.04.5-LTS",
-        "14.04.2-LTS"
-      ],
-      "metadata": {
-        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version. Allowed values: 12.04.5-LTS, 14.04.2-LTS, 15.04."
-      }
     }
   },
   "variables": {
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
+    "ubuntuOSVersion": "14.04.2-LTS",
     "availabilitySetName": "avalibility-set-front",
     "OSDiskName": "osdiskforlinuxsimple",
     "nicName": "myVMNic",
@@ -333,7 +323,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('ubuntuOSVersion')]",
+            "sku": "[variables('ubuntuOSVersion')]",
             "version": "latest"
           },
           "osDisk": {
@@ -352,7 +342,33 @@
             }
           ]
         }
-      }
+      },
+        "resources": [
+            {
+                "name": "config-app",
+                "type": "extensions",
+                "location": "[resourceGroup().location]",
+                "apiVersion": "2015-06-15",
+                "dependsOn": [
+                    "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmname-front'),copyindex()))]"
+                ],
+                "tags": {
+                    "displayName": "config-app"
+                },
+                "properties": {
+                    "publisher": "Microsoft.OSTCExtensions",
+                    "type": "CustomScriptForLinux",
+                    "typeHandlerVersion": "1.4",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "fileUris": [
+                        "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/config-music.sh"
+                      ],
+                      "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicstoresqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+                    }
+                }
+            }
+        ]
     },
     {
       "name": "[variables('availabilitySetName')]",
