@@ -9,3 +9,8 @@ This template deploys a two tier demo application and all necessary infrastructu
 The application architecture is similar to this:
 
 ![](./media/architecture.png)
+
+## Current Known Issues and TODO
+- Extension runs `dotnet run`, which does not exit, hence extension hangs.
+- Have not tested with multiple font end VM’s	
+

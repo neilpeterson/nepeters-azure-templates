@@ -9,3 +9,6 @@ This template deploys a two tier demo application and all necessary infrastructu
 The application architecture is similar to this:
 
 ![](./media/architecture.png)
+
+## Current Known Issues and TODO
+- VM must be rebooted after deployment (app will show error code 500 until reboot. I have tested including a reboot in the extension but this does not resolve the 500.
