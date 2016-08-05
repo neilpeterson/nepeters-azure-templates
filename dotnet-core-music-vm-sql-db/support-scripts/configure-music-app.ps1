@@ -18,6 +18,7 @@ Param (
 
 # install iis
 Install-WindowsFeature web-server -IncludeManagementTools
+& iisreset
 
 # firewall
 netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP localport=80
@@ -51,6 +52,7 @@ $current = "dotnet"
 $replace = 'c:\Program Files\dotnet\dotnet.exe'
 $file = "c:\music\web.config"
 (get-content $file) | foreach-object {$_ -replace $current, $replace} | set-content $file
+& iisreset
 
 # config iis
 Remove-WebSite -Name "Default Web Site"
@@ -58,6 +60,6 @@ Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
 Start-Sleep 240
 & iisreset
-Stop-Website MusicStore
-Start-Website MusicStore
-restart-computer
+#Stop-Website MusicStore
+#Start-Website MusicStore
+#restart-computer
