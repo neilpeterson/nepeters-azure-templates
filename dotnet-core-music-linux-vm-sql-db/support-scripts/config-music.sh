@@ -31,3 +31,6 @@ sudo nginx -s reload
 sudo dotnet restore /music/src/MusicStore.Standalone
 cd /music/src/MusicStore.Standalone
 sudo dotnet run
+
+# config supervisor
+sudo apt-get install supervisor
