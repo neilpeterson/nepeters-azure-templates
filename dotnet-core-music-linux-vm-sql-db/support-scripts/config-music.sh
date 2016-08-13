@@ -33,4 +33,4 @@ cd /music/src/MusicStore.Standalone
 sudo dotnet run
 
 # config supervisor
-sudo apt-get install supervisor
+sudo apt-get install -y supervisor
