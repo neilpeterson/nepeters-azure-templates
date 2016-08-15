@@ -36,3 +36,6 @@ sed -i "s/<replacepass>/$3/g" /music/config.json
 
 # config supervisor
 sudo apt-get install -y supervisor
+sudo cp /music/supervisor/music.conf /etc/supervisor/conf.d/
+sudo service supervisor stop
+sudo service supervisor start
