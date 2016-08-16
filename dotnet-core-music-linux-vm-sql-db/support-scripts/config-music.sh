@@ -17,8 +17,8 @@ sudo mkdir /music
 sudo tar -xf pub-music-store-azure-demo.tar -C /music
 
 # update nginx config files
-sudo rm -f /etc/nginx/sites-available/default
-sudo cp /music/nginx-config/default /etc/nginx/sites-available/
+#sudo rm -f /etc/nginx/sites-available/default
+#sudo cp /music/nginx-config/default /etc/nginx/sites-available/
 
 # update music config file
 #sed -i "s/<replaceserver>/$1/g" /music/src/MusicStore/config.json
@@ -36,3 +36,6 @@ sed -i "s/<replacepass>/$3/g" /music/config.json
 
 # config supervisor
 sudo apt-get install -y supervisor
+#sudo cp /music/supervisor/music.conf /etc/supervisor/conf.d/
+#sudo service supervisor stop
+#sudo service supervisor start
