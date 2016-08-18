@@ -38,8 +38,8 @@ Expand-Archive C:\temp\musicstore.zip c:\music
 
 # update SQL connection string
 Remove-Item c:\music\config.json
-#$configfile = New-Item 'c:\music\config.json'
-$configfile = New-Item 'c:\music-store-azure-demo\src\MusicStore\config.json'
+$configfile = New-Item 'c:\music\config.json'
+#$configfile = New-Item 'c:\music-store-azure-demo\src\MusicStore\config.json'
 $string = '{"AppSettings": { "SiteTitle": "ASP.NET MVC Music Store", "CacheDbResults": true }, "Data": { "DefaultConnection": { "ConnectionString": "Server=' + $sqlserver + ';Database=MusicStore;Integrated Security=False;User Id=' + $user + ';Password=' + $password + ';MultipleActiveResultSets=True;Connect Timeout=30" } } }'
 Add-Content $configfile $string
 
