@@ -34,7 +34,7 @@ Start-Process c:\temp\DotNetCore.WindowsHosting.exe -ArgumentList '/quiet' -Wait
 
 # download music app
 Invoke-WebRequest  https://github.com/neilpeterson/nepeters-azure-templates/raw/master/dotnet-core-music-vm-sql-db/music-app/music-store-azure-demo-pub.zip -OutFile c:\temp\musicstore.zip
-Expand-Archive C:\temp\musicstore.zip c:\
+Expand-Archive C:\temp\musicstore.zip c:\music
 
 # update SQL connection string
 #$configfile = New-Item 'c:\music-store-azure-demo\src\MusicStore\config.json'
