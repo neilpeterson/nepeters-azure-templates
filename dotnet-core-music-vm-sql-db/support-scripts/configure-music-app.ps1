@@ -44,6 +44,7 @@ Add-Content $configfile $string
 # start music store app
 Set-Location C:\music-store-azure-demo\src\MusicStore\
 & "C:\Program Files\dotnet\dotnet.exe" restore
+Start-Process "C:\Program Files\dotnet\dotnet.exe" -ArgumentList "run"
 & "C:\Program Files\dotnet\dotnet.exe" publish -o c:\music
 Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
