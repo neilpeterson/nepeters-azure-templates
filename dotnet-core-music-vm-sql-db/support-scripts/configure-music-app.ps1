@@ -16,15 +16,14 @@ Param (
     [string]$sqlserver
 )
 
-# install iis
-Install-WindowsFeature web-server -IncludeManagementTools
-
 # firewall
 netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP localport=80
 
-# folders
-New-Item -ItemType Directory c:\temp
-New-Item -ItemType Directory c:\music
+
+# install iis
+Install-WindowsFeature web-server -IncludeManagementTools
+
+
 
 # install dot.net core sdk
 Invoke-WebRequest https://go.microsoft.com/fwlink/?LinkID=809122 -outfile c:\temp\DotNetCore.1.0.0-SDK.Preview2-x64.exe
