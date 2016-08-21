@@ -18,6 +18,12 @@ netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP
 New-Item -ItemType Directory c:\temp
 New-Item -ItemType Directory c:\music
 
+$ ts
+
+new-item c:\temp\test.txt
+Add-Content -Value $user C:\temp\test.txt
+Add-Content -Value $user C:\temp\test.txt
+
 # install iis
 Install-WindowsFeature web-server -IncludeManagementTools
 
