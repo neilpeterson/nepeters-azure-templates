@@ -9,7 +9,7 @@ sudo apt-get install -y dotnet-dev-1.0.0-preview2-003121
 # download application
 sudo wget https://raw.github.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/music-app/music-store-azure-demo-pub.tar /
 sudo mkdir /music
-sudo tar -xf music-app.tar -C /music
+sudo tar -xf music-store-azure-demo-pub.tar -C /music
 
 # install nginx, update config files
 sudo apt-get install -y nginx
