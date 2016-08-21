@@ -18,12 +18,6 @@ netsh advfirewall firewall add rule name="http" dir=in action=allow protocol=TCP
 New-Item -ItemType Directory c:\temp
 New-Item -ItemType Directory c:\music
 
-# ts
-new-item c:\temp\test.txt
-Add-Content -Value $user C:\temp\test.txt
-Add-Content -Value $password C:\temp\test.txt
-Add-Content -Value $sqlserver C:\temp\test.txt
-
 # install iis
 Install-WindowsFeature web-server -IncludeManagementTools
 
@@ -44,7 +38,6 @@ Expand-Archive C:\temp\musicstore.zip c:\music
 Start-Process 'C:\Program Files\dotnet\dotnet.exe' -ArgumentList 'c:\music\MusicStore.dll'
 
 #configure iis
-
 Remove-WebSite -Name "Default Web Site"
 Set-ItemProperty IIS:\AppPools\DefaultAppPool\ managedRuntimeVersion ""
 New-Website -Name "MusicStore" -Port 80 -PhysicalPath C:\music\ -ApplicationPool DefaultAppPool
