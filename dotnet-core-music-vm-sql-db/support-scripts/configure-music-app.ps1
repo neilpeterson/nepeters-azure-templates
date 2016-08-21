@@ -1,11 +1,11 @@
+<#
+.SYNOPSIS
+.DESCRIPTION
 .PARAMETER Alias
-
 .EXAMPLE
-
 #>
 
 Param (
-
     [string]$user,
     [string]$password,
     [string]$sqlserver
@@ -39,7 +39,6 @@ Expand-Archive C:\temp\musicstore.zip c:\music
 (Get-Content C:\music\config.json) | ForEach-Object { $_ -replace "<replaceserver>", $sqlserver } | Set-Content C:\music\config.json
 (Get-Content C:\music\config.json) | ForEach-Object { $_ -replace "<replaceuser>", $user } | Set-Content C:\music\config.json
 (Get-Content C:\music\config.json) | ForEach-Object { $_ -replace "<replacepass>", $password } | Set-Content C:\music\config.json
-
 
 # workaround for db creation bug
 Start-Process 'C:\Program Files\dotnet\dotnet.exe' -ArgumentList 'c:\music\MusicStore.dll'
