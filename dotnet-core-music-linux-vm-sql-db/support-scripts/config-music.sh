@@ -27,7 +27,7 @@ sed -i "s/<replacepass>/$3/g" /music/config.json
 sudo apt-get install -y supervisor
 sudo cp /music/supervisor/music.conf /etc/supervisor/conf.d/
 sudo service supervisor stop
-# sudo service supervisor start
+sudo service supervisor start
 
 # workaround for db creation bug
-/usr/bin/dotnet /music/MusicStore.dll
+#/usr/bin/dotnet /music/MusicStore.dll
