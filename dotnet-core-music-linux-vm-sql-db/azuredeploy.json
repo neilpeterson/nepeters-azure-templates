@@ -311,6 +311,9 @@
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
       ],
       "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
         "hardwareProfile": {
           "vmSize": "[variables('vmSize')]"
         },
@@ -343,32 +346,32 @@
           ]
         }
       },
-        "resources": [
-            {
-                "name": "config-app",
-                "type": "extensions",
-                "location": "[resourceGroup().location]",
-                "apiVersion": "2015-06-15",
-                "dependsOn": [
-                    "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmname-front'),copyindex()))]"
-                ],
-                "tags": {
-                    "displayName": "config-app"
-                },
-                "properties": {
-                    "publisher": "Microsoft.OSTCExtensions",
-                    "type": "CustomScriptForLinux",
-                    "typeHandlerVersion": "1.4",
-                    "autoUpgradeMinorVersion": true,
-                    "settings": {
-                      "fileUris": [
-                        "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/config-music.sh"
-                      ],
-                      "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicstoresqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
-                    }
-                }
+      "resources": [
+        {
+          "name": "config-app",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmname-front'),copyindex()))]"
+          ],
+          "tags": {
+            "displayName": "config-app"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/config-music.sh"
+              ],
+              "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicstoresqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
             }
-        ]
+          }
+        }
+      ]
     },
     {
       "name": "[variables('availabilitySetName')]",
