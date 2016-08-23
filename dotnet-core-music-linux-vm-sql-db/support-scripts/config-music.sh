@@ -30,4 +30,4 @@ sudo service supervisor stop
 sudo service supervisor start
 
 # workaround for db creation bug
-#/usr/bin/dotnet /music/MusicStore.dll
+/usr/bin/dotnet /music/MusicStore.dll &
