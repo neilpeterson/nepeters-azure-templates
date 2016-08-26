@@ -1,0 +1,300 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "swarm-manager-name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "swarm-manager-count": {
+      "type": "int"
+    },
+    "swarm-node-name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "swarm-node-count": {
+      "type": "int"
+    },
+    "admin-user": {
+      "type": "string",
+      "minLength": 1
+    },
+    "admin-password": {
+      "type": "securestring"
+    },
+      "swarm-man-dns": {
+          "type": "string",
+          "minLength": 1
+      }
+  },
+    "variables": {
+        "swarm-storage": "[concat('swarm', uniqueString(resourceGroup().id))]",
+        "swarm-networkPrefix": "10.0.0.0/16",
+        "swarm-networkSubnet1Name": "Subnet-1",
+        "swarm-networkSubnet1Prefix": "10.0.0.0/24",
+        "swarm-networkSubnet2Name": "Subnet-2",
+        "swarm-networkSubnet2Prefix": "10.0.1.0/24",
+        "swarm-managerImagePublisher": "Canonical",
+        "swarm-managerImageOffer": "UbuntuServer",
+        "swarm-managerOSDiskName": "swarm-managerOSDisk",
+        "swarm-managerVmSize": "Standard_D2_v2",
+        "swarm-managerVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'swarm-network')]",
+        "swarm-managerSubnetRef": "[concat(variables('swarm-managerVnetID'), '/subnets/', variables('swarm-networkSubnet1Name'))]",
+        "swarm-managerStorageAccountContainerName": "vhds",
+        "swarm-nic-manager": "[concat(parameters('swarm-manager-name'), '-nic')]",
+        "swarm-node-nameImagePublisher": "Canonical",
+        "swarm-node-nameImageOffer": "UbuntuServer",
+        "swarm-node-nameOSDiskName": "swarm-node-nameOSDisk",
+        "swarm-node-nameVmSize": "Standard_D2_v2",
+        "swarm-node-nameVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'swarm-network')]",
+        "swarm-node-nameSubnetRef": "[concat(variables('swarm-node-nameVnetID'), '/subnets/', variables('swarm-networkSubnet1Name'))]",
+        "swarm-node-nameStorageAccountContainerName": "vhds",
+        "swarm-nic-node": "[concat(parameters('swarm-node-name'), '-nic')]",
+        "swarm-man-pip": "swarm-man-pip"
+    },
+  "resources": [
+    {
+      "name": "[variables('swarm-storage')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "swarm-storage"
+      },
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "name": "swarm-network",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "swarm-network"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('swarm-networkPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('swarm-networkSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('swarm-networkSubnet1Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('swarm-nic-manager')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'swarm-network')]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('swarm-man-pip'))]"
+      ],
+      "tags": {
+        "displayName": "swarm-manager-nic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('swarm-managerSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('swarm-man-pip'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('swarm-manager-name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('swarm-storage'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('swarm-nic-manager'))]"
+      ],
+      "tags": {
+        "displayName": "swarm-manager"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('swarm-managerVmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('swarm-manager-name')]",
+          "adminUsername": "[parameters('admin-user')]",
+          "adminPassword": "[parameters('admin-password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('swarm-managerImagePublisher')]",
+            "offer": "[variables('swarm-managerImageOffer')]",
+            "sku": "14.04.2-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "swarm-managerOSDisk",
+            "vhd": {
+              "uri": "[concat('https://', variables('swarm-storage'), '.blob.core.windows.net/', variables('swarm-managerStorageAccountContainerName'), '/', variables('swarm-managerOSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('swarm-nic-manager'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('swarm-nic-node')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', 'swarm-network')]"
+      ],
+      "tags": {
+        "displayName": "swarm-node-nic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('swarm-node-nameSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('swarm-node-name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('swarm-storage'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('swarm-nic-node'))]"
+      ],
+      "tags": {
+        "displayName": "swarm-node-name"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('swarm-node-nameVmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('swarm-node-name')]",
+          "adminUsername": "[parameters('admin-user')]",
+          "adminPassword": "[parameters('admin-password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('swarm-node-nameImagePublisher')]",
+            "offer": "[variables('swarm-node-nameImageOffer')]",
+            "sku": "14.04.2-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "swarm-node-nameOSDisk",
+            "vhd": {
+              "uri": "[concat('https://', variables('swarm-storage'), '.blob.core.windows.net/', variables('swarm-node-nameStorageAccountContainerName'), '/', variables('swarm-node-nameOSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('swarm-nic-node'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('swarm-man-pip')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "swarm-man-pip"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('swarm-man-dns')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('swarm-manager-name'), '/DockerExtension')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('swarm-manager-name'))]"
+      ],
+      "tags": {
+        "displayName": "docker-extension-manager"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "DockerExtension",
+        "typeHandlerVersion": "1.1",
+        "autoUpgradeMinorVersion": true,
+        "settings": { },
+        "protectedSettings": { }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('swarm-node-name'), '/DockerExtension')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('swarm-node-name'))]"
+      ],
+      "tags": {
+        "displayName": "docker-extension-node"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "DockerExtension",
+        "typeHandlerVersion": "1.1",
+        "autoUpgradeMinorVersion": true,
+        "settings": { },
+        "protectedSettings": { }
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

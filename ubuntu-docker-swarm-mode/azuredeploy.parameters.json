@@ -1,0 +1,27 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "swarm-manager-name": {
+            "value": "sm004-man"
+        },
+        "swarm-manager-count": {
+            "value": 1
+        },
+        "swarm-node-name": {
+            "value": "sm004-node"
+        },
+        "swarm-node-count": {
+            "value": 1
+        },
+        "admin-user": {
+            "value": "neillocal"
+        },
+        "admin-password": {
+            "value": "Monkeyskip76"
+        },
+        "swarm-man-dns": {
+            "value": "sm004"
+        }
+    }
+}
