@@ -1,4 +1,60 @@
-﻿"resources": [
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "swarm-manager-name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "swarm-manager-count": {
+      "type": "int"
+    },
+    "swarm-node-name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "swarm-node-count": {
+      "type": "int"
+    },
+    "admin-user": {
+      "type": "string",
+      "minLength": 1
+    },
+    "admin-password": {
+      "type": "securestring"
+    },
+    "swarm-man-dns": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "variables": {
+    "swarm-storage": "[concat('swarm', uniqueString(resourceGroup().id))]",
+    "swarm-networkPrefix": "10.0.0.0/16",
+    "swarm-networkSubnet1Name": "Subnet-1",
+    "swarm-networkSubnet1Prefix": "10.0.0.0/24",
+    "swarm-networkSubnet2Name": "Subnet-2",
+    "swarm-networkSubnet2Prefix": "10.0.1.0/24",
+    "swarm-managerImagePublisher": "Canonical",
+    "swarm-managerImageOffer": "UbuntuServer",
+    "swarm-managerOSDiskName": "swarm-managerOSDisk",
+    "swarm-managerVmSize": "Standard_D2_v2",
+    "swarm-managerVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'swarm-network')]",
+    "swarm-managerSubnetRef": "[concat(variables('swarm-managerVnetID'), '/subnets/', variables('swarm-networkSubnet1Name'))]",
+    "swarm-managerStorageAccountContainerName": "vhds",
+    "swarm-nic-manager": "[concat(parameters('swarm-manager-name'), '-nic')]",
+    "swarm-node-nameImagePublisher": "Canonical",
+    "swarm-node-nameImageOffer": "UbuntuServer",
+    "swarm-node-nameOSDiskName": "swarm-node-nameOSDisk",
+    "swarm-node-nameVmSize": "Standard_D2_v2",
+    "swarm-node-nameVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'swarm-network')]",
+    "swarm-node-nameSubnetRef": "[concat(variables('swarm-node-nameVnetID'), '/subnets/', variables('swarm-networkSubnet1Name'))]",
+    "swarm-node-nameStorageAccountContainerName": "vhds",
+    "swarm-nic-node": "[concat(parameters('swarm-node-name'), '-nic')]",
+    "swarm-man-pip": "swarm-man-pip",
+    "extensionName": "DockerExtension"
+  },
+  "resources": [
     {
       "name": "[variables('swarm-storage')]",
       "type": "Microsoft.Storage/storageAccounts",
@@ -265,3 +321,6 @@
       }
     }
   ],
+  "outputs": {
+  }
+}
