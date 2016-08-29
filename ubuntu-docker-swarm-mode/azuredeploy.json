@@ -20,6 +20,9 @@
       "type": "string",
       "minLength": 1
     },
+    "sshKeyData": {
+      "type": "string"
+    },
     "admin-password": {
       "type": "securestring"
     },
@@ -52,7 +55,8 @@
     "swarm-node-nameStorageAccountContainerName": "vhds",
     "swarm-nic-node": "[concat(parameters('swarm-node-name'), '-nic')]",
     "swarm-man-pip": "swarm-man-pip",
-    "extensionName": "DockerExtension"
+    "extensionName": "DockerExtension",
+    "sshKeyPath": "[concat('/home/',parameters('admin-user'),'/.ssh/authorized_keys')]"
   },
   "resources": [
     {
@@ -141,7 +145,17 @@
         "osProfile": {
           "computerName": "[parameters('swarm-manager-name')]",
           "adminUsername": "[parameters('admin-user')]",
-          "adminPassword": "[parameters('admin-password')]"
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
         },
         "storageProfile": {
           "imageReference": {
@@ -228,7 +242,7 @@
         "[concat('Microsoft.Network/networkInterfaces/', variables('swarm-nic-node'))]"
       ],
       "tags": {
-        "displayName": "swarm-node-name"
+        "displayName": "swarm-node"
       },
       "properties": {
         "hardwareProfile": {
@@ -302,7 +316,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('swarm-node-name'), '/DockerExtension')]",
+      "name": "[concat(parameters('swarm-node-name'), '/', variables('extensionName'))]",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "dependsOn": [

@@ -3,25 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "swarm-manager-name": {
-            "value": "sm004-man"
+            "value": "man004"
         },
         "swarm-manager-count": {
             "value": 1
         },
         "swarm-node-name": {
-            "value": "sm004-node"
+            "value": "node004"
         },
         "swarm-node-count": {
             "value": 1
         },
         "admin-user": {
-            "value": "neillocal"
+            "value": user
         },
-        "admin-password": {
-            "value": "Monkeyskip76"
+        "sshKeyData": {
+            "value": "ssh-rsa key"
         },
         "swarm-man-dns": {
-            "value": "sm004"
+            "value": "man004sm"
+        },
+        "admin-password": {
+            "value": "pass"
         }
     }
 }
