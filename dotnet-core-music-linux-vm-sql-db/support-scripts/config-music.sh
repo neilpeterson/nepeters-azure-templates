@@ -15,7 +15,7 @@ sudo tar -xf music-store-azure-demo-pub.tar -C /opt/music
 sudo apt-get install -y nginx
 sudo service nginx start
 sudo rm -f /etc/nginx/sites-available/default
-sudo cp /music/nginx-config/default /etc/nginx/sites-available/
+sudo cp /opt/music/nginx-config/default /etc/nginx/sites-available/
 sudo nginx -s reload
 
 # update music config file
