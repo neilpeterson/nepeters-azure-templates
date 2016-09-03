@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -310,7 +310,11 @@
         "type": "DockerExtension",
         "typeHandlerVersion": "1.1",
         "autoUpgradeMinorVersion": true,
-        "settings": { },
+        "settings": {
+          "docker": {
+            "port": "2375"
+          }
+        },
         "protectedSettings": { }
       }
     },
@@ -330,7 +334,11 @@
         "type": "DockerExtension",
         "typeHandlerVersion": "1.1",
         "autoUpgradeMinorVersion": true,
-        "settings": { },
+        "settings": {
+          "docker": {
+            "port": "2375"
+          }
+        },
         "protectedSettings": { }
       }
     }
