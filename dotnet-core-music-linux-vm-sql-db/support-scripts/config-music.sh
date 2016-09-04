@@ -35,6 +35,6 @@ sudo service supervisor start
 
 # workaround for db creation bug
 sudo chown neillocal /opt/music/config.json
-#sudo chmod 600 /opt/music/config.json
+sudo chmod 600 /opt/music/config.json
 /usr/bin/dotnet /opt/music/MusicStore.dll &
 
