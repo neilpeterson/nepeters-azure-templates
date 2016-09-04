@@ -28,7 +28,7 @@ sed -i "s/<replacepass>/$3/g" /opt/music/config.json
 # config supervisor
 sudo apt-get install -y supervisor
 sudo touch /etc/supervisor/conf.d/music.conf
-sudo wget https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/music-app/supervisor/music.conf -O /etc/supervisor/conf.d/
+sudo wget https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/music-app/supervisor/music.conf -O /etc/supervisor/conf.d/music.conf
 #sudo cp /opt/music/supervisor/music.conf
 sudo service supervisor stop
 sudo service supervisor start
