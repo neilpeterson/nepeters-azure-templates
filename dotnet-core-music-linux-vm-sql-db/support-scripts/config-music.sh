@@ -14,7 +14,9 @@ sudo tar -xf music-store-azure-demo-pub.tar -C /opt/music
 # install nginx, update config files
 sudo apt-get install -y nginx
 sudo service nginx start
-sudo rm -f /etc/nginx/sites-available/default
+#sudo rm -f /etc/nginx/sites-available/default
+sudo touch /etc/nginx/sites-available/default
+sudo wget https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/music-app/nginx-config/default -O /etc/nginx/sites-available/default
 sudo cp /opt/music/nginx-config/default /etc/nginx/sites-available/
 sudo nginx -s reload
 
@@ -25,7 +27,9 @@ sed -i "s/<replacepass>/$3/g" /opt/music/config.json
 
 # config supervisor
 sudo apt-get install -y supervisor
-sudo cp /opt/music/supervisor/music.conf /etc/supervisor/conf.d/
+sudo touch /etc/supervisor/conf.d/music.conf
+sudo wget https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/music-app/supervisor/music.conf -O /etc/supervisor/conf.d/
+#sudo cp /opt/music/supervisor/music.conf
 sudo service supervisor stop
 sudo service supervisor start
 
