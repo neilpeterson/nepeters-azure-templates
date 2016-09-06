@@ -9,6 +9,3 @@ This template deploys a two tier demo application and all necessary infrastructu
 The application architecture is similar to this:
 
 ![](./media/architecture.png)
-
-## Current Known Issues and TODO
-- VM must be rebooted after deployment to remove http 500 - currently investigating.
