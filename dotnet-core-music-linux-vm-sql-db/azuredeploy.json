@@ -2,21 +2,30 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmname-front": {
+    "vmName": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "metadata": {
+        "description": "VM Name."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH String."
+      }
     },
     "adminUsername": {
       "type": "string",
       "minLength": 1,
       "metadata": {
-        "description": "User name for the Virtual Machine."
+        "description": "Admin user name for SQL Database."
       }
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "Password for the Virtual Machine."
+        "description": "Password for SQL Database."
       }
     },
     "numberOfInstances": {
@@ -24,7 +33,7 @@
       "minValue": 1,
       "defaultValue": 1,
       "metadata": {
-        "description": "Number of VM instances to be created behind internal load balancer control"
+        "description": "Number of VM instances to be created behind load balancer."
       }
     },
     "publicipaddressDnsName": {
@@ -39,40 +48,36 @@
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
     "ubuntuOSVersion": "14.04.2-LTS",
-    "availabilitySetName": "avalibility-set-front",
-    "OSDiskName": "osdiskforlinuxsimple",
-    "nicName": "myVMNic",
-    "subnetName": "Subnet",
-    "subnetfront": "subnetfront",
-    "subnetRefront": "[concat(variables('vnetId'), '/subnets/', variables('subnetfront'))]",
-    "networkInterfaceNamePrefixfront": "nic-front",
+    "vmSize": "Standard_D1",
     "vhdStorageType": "Standard_LRS",
-    "publicipaddressName": "public-ip-front",
-    "loadBalancerName": "load-balancer-front",
+    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
+    "availabilitySetName": "AvalibilitySet",
+    "subnetName": "MusicSubnet",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+    "networkInterfaceNamePrefix": "NetworkInterface",
+    "publicIpAddressName": "PublicIp",
+    "loadBalancerName": "LoadBalancer",
     "loadBalencerRule": "HTTP",
     "lbBackEndPool": "lbBackEndPool",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
     "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
-    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
-    "vhdStorageContainerName": "vhds",
-    "vmName": "MyUbuntuVM",
-    "vmSize": "Standard_D1",
-    "virtualNetworkName": "MyVNET",
+    "ipConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+    "virtualNetworkName": "VirtualNetwork",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "nsgfront": "nsg-front",
-    "musicstoresqlName": "[concat('sql-musicstore-', uniqueString(resourceGroup().id))]"
+    "networkSecurityGroup": "NetworkSecurityGroup",
+    "musicStoreSqlName": "[concat('sql', uniqueString(resourceGroup().id))]",
+    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]"
   },
+
   "resources": [
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('nsgfront')]",
+      "name": "[variables('networkSecurityGroup')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "nsg-front"
+        "displayName": "network-security-group"
       },
       "properties": {
         "securityRules": [
@@ -122,10 +127,10 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicipaddressName')]",
+      "name": "[variables('publicIpAddressName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "public-ip-front"
+        "displayName": "public-ip"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -140,7 +145,7 @@
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgfront'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroup'))]"
       ],
       "tags": {
         "displayName": "virtual-network"
@@ -153,11 +158,11 @@
         },
         "subnets": [
           {
-            "name": "[variables('subnetfront')]",
+            "name": "[variables('subnetName')]",
             "properties": {
               "addressPrefix": "10.0.0.0/24",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgfront'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
               }
             }
           }
@@ -167,10 +172,10 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('networkInterfaceNamePrefixfront'), copyindex())]",
+      "name": "[concat(variables('networkInterfaceNamePrefix'), copyindex())]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "nic-front"
+        "displayName": "network-interface"
       },
       "copy": {
         "name": "nicLoop",
@@ -179,7 +184,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicipaddressName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatRules/', 'SSH-VM', copyIndex())]"
       ],
       "properties": {
@@ -189,7 +194,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[variables('subnetRefront')]"
+                "id": "[variables('subnetRef')]"
               },
               "loadBalancerBackendAddressPools": [
                 {
@@ -212,18 +217,18 @@
       "name": "[variables('loadBalancerName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "load-balancer-front"
+        "displayName": "load-balancer"
       },
       "dependsOn": [
         "[variables('vnetId')]",
-        "[variables('publicipaddressName')]"
+        "[variables('publicIpAddressName')]"
       ],
       "properties": {
         "frontendIPConfigurations": [
           {
             "properties": {
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicipaddressName'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
               }
             },
             "name": "LoadBalancerFrontend"
@@ -285,7 +290,7 @@
       ],
       "properties": {
         "frontendIPConfiguration": {
-          "id": "[variables('frontEndIPConfigID')]"
+          "id": "[variables('ipConfigID')]"
         },
         "protocol": "tcp",
         "frontendPort": "[copyIndex(5000)]",
@@ -296,14 +301,14 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(parameters('vmname-front'),copyindex())]",
+      "name": "[concat(parameters('vmName'),copyindex())]",
       "copy": {
         "name": "virtualMachineLoop",
         "count": "[parameters('numberOfInstances')]"
       },
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "vm-front"
+        "displayName": "virtual-machine"
       },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
@@ -318,9 +323,19 @@
           "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[concat(parameters('vmname-front'),copyindex())]",
+          "computerName": "[concat(parameters('vmName'),copyindex())]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
         },
         "storageProfile": {
           "imageReference": {
@@ -341,7 +356,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefixfront'), copyindex()))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefix'), copyindex()))]"
             }
           ]
         }
@@ -353,7 +368,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmname-front'),copyindex()))]"
+            "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmName'),copyindex()))]"
           ],
           "tags": {
             "displayName": "config-app"
@@ -367,7 +382,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/config-music.sh"
               ],
-              "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicstoresqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+              "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicStoreSqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
             }
           }
         }
@@ -380,7 +395,7 @@
       "apiVersion": "2015-06-15",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "avalibility-set-front"
+        "displayName": "avalibility-set"
       },
       "properties": {
         "platformUpdateDomainCount": 1,
@@ -388,7 +403,7 @@
       }
     },
     {
-      "name": "[variables('musicstoresqlName')]",
+      "name": "[variables('musicStoreSqlName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "apiVersion": "2014-04-01-preview",
@@ -407,7 +422,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('musicstoresqlName'))]"
+            "[concat('Microsoft.Sql/servers/', variables('musicStoreSqlName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
