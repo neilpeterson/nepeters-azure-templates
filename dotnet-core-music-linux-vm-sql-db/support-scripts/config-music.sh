@@ -24,7 +24,7 @@ sed -i "s/<replaceserver>/$1/g" /opt/music/config.json
 sed -i "s/<replaceuser>/$2/g" /opt/music/config.json
 sed -i "s/<replacepass>/$3/g" /opt/music/config.json
 sudo chown $2 /opt/music/config.json
-sudo chmod 600 /opt/music/config.json
+sudo chmod 0400 /opt/music/config.json
 
 # config supervisor
 sudo apt-get install -y supervisor
