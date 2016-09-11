@@ -19,7 +19,7 @@
       "type": "string",
       "minLength": 1,
       "metadata": {
-        "description": "Admin user name for SQL Database."
+        "description": "Admin user name for VM and SQL Database."
       }
     },
     "sqlAdminPassword": {
