@@ -22,7 +22,7 @@
         "description": "Admin user name for SQL Database."
       }
     },
-    "adminPassword": {
+    "sqlAdminPassword": {
       "type": "securestring",
       "metadata": {
         "description": "Password for SQL Database."
@@ -153,7 +153,7 @@
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "10.0.0.0/16"
+            "10.0.0.0/24"
           ]
         },
         "subnets": [
@@ -382,7 +382,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/dotnet-core-music-linux-vm-sql-db/support-scripts/config-music.sh"
               ],
-              "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicStoreSqlName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+              "commandToExecute": "[concat('sudo sh config-music.sh ',variables('musicStoreSqlName'), ' ', parameters('adminUsername'), ' ', parameters('sqlAdminPassword'))]"
             }
           }
         }
@@ -413,7 +413,7 @@
       },
       "properties": {
         "administratorLogin": "[parameters('adminUsername')]",
-        "administratorLoginPassword": "[parameters('adminPassword')]"
+        "administratorLoginPassword": "[parameters('sqlAdminPassword')]"
       },
       "resources": [
         {
