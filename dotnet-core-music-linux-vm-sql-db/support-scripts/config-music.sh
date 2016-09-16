@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # install dotnet core
 sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
