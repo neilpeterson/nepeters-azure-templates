@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  
+  "parameters": {
+    "accountame": {
+      "type": "string"
+    }
+  },
+  
+  "variables": {},
+  
+  "resources": [
+    {
+      "comments": "Generalized from resource: '/subscriptions/d5b9d4b7-6fc1-46c5-bafe-38effaed19b2/resourcegroups/testaaforjson/providers/Microsoft.Automation/automationAccounts/testaaforjson'.",
+      "type": "Microsoft.Automation/automationAccounts",
+      "name": "[parameters('accountame')]",
+      "apiVersion": "2015-10-31",
+      "location": "eastus2",
+      "properties": {
+        "sku": {
+          "name": "Free"
+        }
+      },
+      "resources": [],
+      "dependsOn": []
+    }
+  ]
+}
