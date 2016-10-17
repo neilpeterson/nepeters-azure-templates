@@ -1,0 +1,242 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  
+  "parameters": {
+    "accountame": {
+      "type": "string"
+    },
+      "adminusername": {
+          "type": "string",
+          "minLength": 1
+      },
+      "password": {
+          "type": "securestring"
+      },
+      "aademopipDnsName": {
+          "type": "string",
+          "minLength": 1
+      }
+  },
+
+  "variables": {
+    "aademovmName": "aademovm",
+    "aademovnetPrefix": "10.0.0.0/16",
+    "aademovnetSubnet1Name": "Subnet-1",
+    "aademovnetSubnet1Prefix": "10.0.0.0/24",
+    "aademovnetSubnet2Name": "Subnet-2",
+    "aademovnetSubnet2Prefix": "10.0.1.0/24",
+    "networkSecurityGroup": "NetworkSecurityGroup",
+    "AADemoVMImagePublisher": "MicrosoftWindowsServer",
+    "AADemoVMImageOffer": "WindowsServer",
+    "AADemoVMWindowsOSVersion": "2016-Datacenter",
+    "AADemoVMOSDiskName": "AADemoVMOSDisk",
+    "AADemoVMVmSize": "Standard_D2_v2",
+    "aademovmType": "Standard_LRS",
+    "AADemoVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'aademovnet')]",
+    "AADemoVMSubnetRef": "[concat(variables('AADemoVMVnetID'), '/subnets/', variables('aademovnetSubnet1Name'))]",
+    "AADemoVMStorageAccountContainerName": "vhds",
+    "AADemoVMNicName": "[concat(variables('AADemoVMName'), 'NetworkInterface')]",
+    "aademopipName": "aademopip"
+  },
+
+  "resources": [
+    {
+      "name": "[parameters('accountame')]",
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2015-10-31",
+      "location": "eastus2",
+      "tags": {
+        "displayName": "azure-automation-account"
+      },
+      "dependsOn": [],
+      "properties": {
+        "sku": {
+          "name": "Free"
+        }
+      },
+      "resources": []
+    },
+    {
+      "name": "[variables('aademovmName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "aademovm"
+      },
+      "properties": {
+        "accountType": "[variables('aademovmType')]"
+      }
+    },
+    {
+      "name": "aademovnet",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroup'))]"
+      ],
+      "tags": {
+        "displayName": "aademovnet"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('aademovnetPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('aademovnetSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('aademovnetSubnet1Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
+              }
+            }
+          },
+          {
+            "name": "[variables('aademovnetSubnet2Name')]",
+            "properties": {
+              "addressPrefix": "[variables('aademovnetSubnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('AADemoVMNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'aademovnet')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('aademopipName'))]"
+      ],
+      "tags": {
+        "displayName": "AADemoVMNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('AADemoVMSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('aademopipName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSecurityGroup')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nsg-front"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "http",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "rdp",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('AADemoVMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('aademovmName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('AADemoVMNicName'))]"
+      ],
+      "tags": {
+        "displayName": "AADemoVM"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('AADemoVMVmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('AADemoVMName')]",
+          "adminUsername": "[parameters('adminusername')]",
+          "adminPassword": "[parameters('password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('AADemoVMImagePublisher')]",
+            "offer": "[variables('AADemoVMImageOffer')]",
+            "sku": "[variables('AADemoVMWindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "AADemoVMOSDisk",
+            "vhd": {
+              "uri": "[concat('https://', variables('aademovmName'), '.blob.core.windows.net/', variables('AADemoVMStorageAccountContainerName'), '/', variables('AADemoVMOSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('AADemoVMNicName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('aademopipName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "aademopip"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('aademopipDnsName')]"
+        }
+      }
+    }
+  ]
+}
