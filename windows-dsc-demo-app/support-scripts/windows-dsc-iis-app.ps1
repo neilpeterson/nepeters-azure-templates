@@ -25,7 +25,7 @@ configuration APP {
         }
 
         File APPDEMO {
-            SourcePath = "C:\Packages\Plugins\Microsoft.Powershell.DSC\2.14.0.0\DSCWork\windows-dsc-iis-app.ps1.0\demo-app"
+            SourcePath = "C:\Packages\Plugins\Microsoft.Powershell.DSC\2.20.0.0\DSCWork\windows-dsc-iis-app.ps1.0\demo-app"
             DestinationPath = "C:\inetpub\wwwroot\"
             Recurse = $true
             Type = "Directory"
