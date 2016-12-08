@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "accountame": {
-            "value": "aavmnsg01"
+            "value": "myAccount"
         },
         "adminusername": {
-            "value": "neillocal"
+            "value": "myUser"
         },
         "password": {
-            "value": "Monkeyskip76"
+            "value": "myPassword"
         },
         "aademopipDnsName": {
-            "value": "aavmnsg01"
+            "value": "myDNS"
         }
     }
 }
