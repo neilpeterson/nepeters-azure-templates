@@ -9,3 +9,4 @@ sudo apt-get update
 sudo apt-get install jenkins -y
 sudo apt-get install git -y
 sudo apt-get install python3-pip -y
+sudo touch ${JENKINS_HOME}/jenkins.install.InstallUtil.lastExecVersion
