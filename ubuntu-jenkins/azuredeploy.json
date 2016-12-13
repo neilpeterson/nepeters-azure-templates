@@ -27,20 +27,21 @@
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
     "ubuntuOSVersion": "14.04.2-LTS",
-    "OSDiskName": "osdiskfordockersimple",
-    "nicName": "myVMNic",
+    "OSDiskName": "osdisk",
+    "nicName": "jenkins-vnet",
     "addressPrefix": "10.0.0.0/16",
     "subnetName": "Subnet",
     "subnetPrefix": "10.0.0.0/24",
     "vhdStorageType": "Standard_LRS",
     "publicIPAddressType": "Dynamic",
     "vhdStorageContainerName": "vhds",
-    "vmName": "MyDockerVM",
+    "vmName": "jenkins-vm",
     "vmSize": "Standard_D2_v2",
-    "virtualNetworkName": "MyVNET",
+    "virtualNetworkName": "jenkins-vm-nic",
+    "networkSecurityGroup": "jenkins-nsg",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]"
+    "vhdStorageName": "[concat('jenkins', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -78,17 +79,50 @@
         "displayName": "VirtualNetwork"
       },
       "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroup'))]"
+      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
             "[variables('addressPrefix')]"
           ]
         },
-        "subnets": [
+"subnets": [
           {
             "name": "[variables('subnetName')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSecurityGroup')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "nsg-front"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "jenkins",
+            "properties": {
+              "description": "http endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "8080",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
             }
           }
         ]
@@ -148,7 +182,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('ubuntuOSVersion')]",
+            "sku": "[variables('ubuntuOSVersion')]",
             "version": "latest"
           },
           "osDisk": {
@@ -167,7 +201,33 @@
             }
           ]
         }
-      }
+      },
+        "resources": [
+            {
+                "name": "config-jenkins",
+                "type": "extensions",
+                "location": "[resourceGroup().location]",
+                "apiVersion": "2015-06-15",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+                ],
+                "tags": {
+                    "displayName": "config-jenkins"
+                },
+                "properties": {
+                    "publisher": "Microsoft.OSTCExtensions",
+                    "type": "CustomScriptForLinux",
+                    "typeHandlerVersion": "1.4",
+                    "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": [
+                      "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/ubuntu-jenkins/support-scripts/config-jenkins.sh"
+                    ],
+                    "commandToExecute": "sudo sh config-jenkins.sh"
+                  }
+                }
+            }
+        ]
     }
   ]
 }

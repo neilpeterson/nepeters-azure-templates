@@ -3,10 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": null
+            "value": "user"
         },
         "dnsNameForPublicIP": {
-            "value": null
+            "value": "dns"
+        },
+        "adminPassword": {
+            "value": "password"
         }
     }
 }
