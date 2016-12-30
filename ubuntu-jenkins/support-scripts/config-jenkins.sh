@@ -10,5 +10,8 @@ sudo apt-get install jenkins -y
 sudo apt-get install git -y
 sudo apt-get install python3-pip -y
 sudo pip3 install requests
+sudo apt-get install libffi-dev -y
+sudo apt-get install libssl-dev -y
+sudo apt-get install python-dev -y
 sudo pip3 install azure-storage
 #sudo touch ${JENKINS_HOME}/jenkins.install.InstallUtil.lastExecVersion
