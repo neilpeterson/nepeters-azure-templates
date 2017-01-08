@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -221,9 +221,9 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/ubuntu-ubunut/support-scripts/config-ubunut.sh"
+                "https://raw.githubusercontent.com/neilpeterson/nepeters-azure-templates/master/ubuntu-azure-powershell/support-scripts/config-powershell.sh"
               ],
-              "commandToExecute": "sudo sh config-ubunut.sh"
+              "commandToExecute": "sudo sh config-powershell.sh"
             }
           }
         }
