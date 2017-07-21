@@ -316,7 +316,7 @@
           "imageReference": {
             "publisher": "[variables('imagePublisher')]",
             "offer": "[variables('imageOffer')]",
-            "sku": "Windows-Server-Technical-Preview",
+            "sku": "2016-Datacenter",
             "version": "latest"
           },
           "osDisk": {
