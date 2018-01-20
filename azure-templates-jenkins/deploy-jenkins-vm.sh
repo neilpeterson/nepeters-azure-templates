@@ -27,7 +27,7 @@ ip=$(az vm list-ip-addresses --resource-group $resourceGroup --name $virtualMach
 
 # Copy Kube config file to Jenkins
 ssh -o "StrictHostKeyChecking no" $adminUser@$ip sudo mkdir -m 777 /home/$adminUser/.kube/
-yes | scp $pathToKubeConfig $adminUser@$ip:~/.kube/config
+yes | scp $pathToKubeConfig $adminUser@$ip:/var/lib/jenkins/config
 
 # Get Jenkins Unlock Key
 url="http://$ip:8080"
