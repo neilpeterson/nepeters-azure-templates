@@ -1,5 +1,5 @@
 #!/bin/bash
-resourceGroup=myResourceGroup
+resourceGroup=myResourceGroup2
 virtualMachine=myVM
 adminUser=azureuser
 pathToKubeConfig=/Users/$USER/.kube/config
@@ -26,9 +26,9 @@ az vm extension set --publisher Microsoft.Azure.Extensions --version 2.0 --name 
 ip=$(az vm list-ip-addresses --resource-group $resourceGroup --name $virtualMachine --query [0].virtualMachine.network.publicIpAddresses[0].ipAddress -o tsv)
 
 # Copy Kube config file to Jenkins
-# ssh -o "StrictHostKeyChecking no" $adminUser@$ip sudo mkdir -m 777 /home/$adminUser/.kube/
 ssh -o "StrictHostKeyChecking no" $adminUser@$ip sudo chmod 777 /var/lib/jenkins
 yes | scp $pathToKubeConfig $adminUser@$ip:/var/lib/jenkins/config
+ssh -o "StrictHostKeyChecking no" $adminUser@$ip sudo "chmod 777 /var/lib/jenkins/config"
 
 # Get Jenkins Unlock Key
 url="http://$ip:8080"
