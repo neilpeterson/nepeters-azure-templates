@@ -13,8 +13,9 @@ sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update
 sudo apt-get install docker-ce -y
-sudo usermod -aG docker jenkins
-sudo service docker restart
+#sudo usermod -aG docker jenkins
+#sudo service jenkins restart
+echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Azure CLI
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
