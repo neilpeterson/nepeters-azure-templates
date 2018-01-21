@@ -13,9 +13,6 @@ sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update
 sudo apt-get install docker-ce -y
-#sudo usermod -aG docker jenkins
-#sudo service jenkins restart
-echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Azure CLI
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
@@ -28,3 +25,6 @@ cd /tmp/
 sudo curl -kLO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
+
+# Jenkins account to sudo
+echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
