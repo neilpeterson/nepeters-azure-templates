@@ -30,4 +30,4 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 #echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 usermod -aG docker jenkins
 usermod -aG docker azureuser
-# service jenkins restart
+service jenkins restart
