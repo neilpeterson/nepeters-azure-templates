@@ -1,5 +1,5 @@
 #!/bin/bash
-resourceGroup=myResourceGroup
+resourceGroup=myResourceGroup2
 virtualMachine=myVM
 adminUser=azureuser
 pathToKubeConfig=/Users/$USER/.kube/config
