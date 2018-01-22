@@ -27,4 +27,7 @@ chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
 # Jenkins account to sudo
-echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+#echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+usermod -aG docker jenkins
+usermod -aG docker azureuser
+service jenkins restart
