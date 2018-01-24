@@ -26,8 +26,7 @@ sudo curl -kLO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
-# Jenkins account to sudo
-#echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# Configure access
 usermod -aG docker jenkins
 usermod -aG docker azureuser
 sudo touch /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion
