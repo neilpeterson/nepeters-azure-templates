@@ -1,5 +1,5 @@
 #!/bin/bash
-resourceGroup=myResourceGroup
+export resourceGroup=myResourceGroup$RANDOM
 virtualMachine=myVM
 adminUser=azureuser
 pathToKubeConfig=~/.kube/config
