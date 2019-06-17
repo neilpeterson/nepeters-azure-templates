@@ -4,3 +4,4 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+neilpeterson/nepeters-azure-templates/master/azure-devops-org-project/azuredeploy.json
