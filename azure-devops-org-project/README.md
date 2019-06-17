@@ -6,20 +6,21 @@ This template will create both an Azure DevOps Organization and an empty project
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+
 Once deployed, find both the organization and projects resources in the resource group.
 
-![](./images/arm-objects.png)
+![](./images/arm-objects.jpg)
 
 Select the organization object, and then the "My Azure DevOps Organizations" link.
 
-![](./images/org.png)
+![](./images/org.jpg)
 
 Select the project.
 
-![](./images/project.png)
+![](./images/project.jpg)
 
 Begin working with the new (empty) project.
 
-![](./images/project.png)
+![](./images/project.jpg)
 
 Note: removing the Azure resource group, and azure objects, does not remove the Azure DevOps project / organization.
