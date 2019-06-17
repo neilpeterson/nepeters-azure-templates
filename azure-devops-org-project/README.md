@@ -21,3 +21,5 @@ Select the project.
 Begin working with the new (empty) project.
 
 ![](./images/project.png)
+
+Note: removing the Azure resource group, and azure objects, does not remove the Azure DevOps project / organization.
